@@ -57,12 +57,19 @@
   .count { color: var(--muted); font-size: 13px; margin: 6px 0 16px; }
 
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; padding-bottom: 48px; }
-  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 22px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 14px; }
   .person-top { display: flex; gap: 12px; align-items: center; }
   .avatar { flex: none; width: 46px; height: 46px; border-radius: 50%; background: var(--chip); color: var(--chip-ink); display: grid; place-items: center; font-weight: 600; font-size: 16px; }
   .card h3 { margin: 0; font-size: 17px; line-height: 1.25; }
   .meta { color: var(--muted); font-size: 13px; }
-  .role { display: inline-block; align-self: flex-start; font-size: 11px; font-weight: 600; background: var(--accent); color: var(--accent-ink); border-radius: 6px; padding: 1px 8px; margin-bottom: 3px; text-transform: uppercase; letter-spacing: .04em; }
+  .role { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+  .role::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex: none; }
+  .clamp { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .oneline { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pt-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .chip.more { background: none; color: var(--muted); cursor: default; padding-left: 2px; }
+  .card-foot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 14px; border-top: 1px solid var(--line); }
+  .card-foot .btn { padding: 8px 18px; }
   .bio { margin: 0; font-size: 14px; }
   .chips { display: flex; flex-wrap: wrap; gap: 6px; }
   .chip { background: var(--chip); color: var(--chip-ink); border-radius: 999px; padding: 2px 10px; font-size: 12px; cursor: pointer; border: 0; font-family: inherit; }
@@ -102,6 +109,8 @@
   dialog::backdrop { background: rgba(20,26,22,.5); }
   .dlg-head { padding: 20px 22px 0; }
   .dlg-head h2 { margin: 0; font-family: var(--head-font); font-size: 22px; }
+  #dlgSub { margin-top: 6px; line-height: 1.6; }
+  #dlgSub b { color: var(--ink); font-weight: 600; }
   .dlg-body { padding: 14px 22px 4px; display: grid; gap: 12px; }
   .dlg-body label { display: grid; gap: 4px; font-size: 13px; font-weight: 600; }
   .dlg-body input, .dlg-body select, .dlg-body textarea { font: 400 14px var(--body-font); padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--ink); width: 100%; }
@@ -131,10 +140,10 @@
     --brand: #1d2550; --brand-ink: #ffffff; --accent: #3f5bd0; --accent-ink: #ffffff;
     --chip: #fbefc4; --chip-ink: #1d2550; --head-bg: #fbe9a6; --head-ink: #1d2550;
   }
-  body[data-palette="bigbend"] {       /* desert clay + warm brown + cactus green */
-    --bg: #faf6f1; --ink: #3a2c26; --muted: #6d5f58; --line: #ebe0d6;
+  body[data-palette="bigbend"] {       /* soft warm gray + warm brown + cactus green */
+    --bg: #f7f6f4; --ink: #3a2c26; --muted: #6b635e; --line: #e4e1dc;
     --brand: #3a2c26; --brand-ink: #ffffff; --accent: #3d7a55; --accent-ink: #ffffff;
-    --chip: #f3e2d3; --chip-ink: #3a2c26; --head-bg: #f2d9c4; --head-ink: #3a2c26;
+    --chip: #ebe9e5; --chip-ink: #3a2c26; --head-bg: #e3e1dd; --head-ink: #3a2c26;
   }
 
   /* ---------- Prototype switcher bar ---------- */
@@ -567,18 +576,18 @@ function personCard(p) {
     <article class="card">
       <div class="person-top">
         <div class="avatar" aria-hidden="true">${esc(initials(p.name))}</div>
-        <div>
-          ${p.role ? `<span class="role">${esc(p.role)}</span>` : ""}
+        <div class="pt-text">
           <h3>${esc(p.name)}</h3>
-          <div class="meta">${[p.org, place(p)].filter(Boolean).map(esc).join(" · ")}</div>
+          <div class="meta oneline">${esc(p.org)}</div>
         </div>
       </div>
-      ${p.bio ? `<p class="bio">${esc(p.bio)}</p>` : ""}
-      ${p.topicsList.length ? `<div class="chips">${p.topicsList.map(t => `<button class="chip" data-topic="${esc(t)}">${esc(t)}</button>`).join("")}</div>` : ""}
-      ${p.openList.length ? `<div class="opento"><b>Open to:</b> ${p.openList.map(esc).join(", ")}</div>` : ""}
-      ${p.languages ? `<div class="opento"><b>Languages:</b> ${esc(p.languages)}</div>` : ""}
-      <div class="links">${linksHtml(p)}</div>
-      <div class="actions">${connectBtn(p)}</div>
+      ${p.role || p.city ? `<span class="role">${[p.role, p.city].filter(Boolean).map(esc).join(" · ")}</span>` : ""}
+      ${p.bio ? `<p class="bio clamp">${esc(p.bio)}</p>` : ""}
+      ${p.topicsList.length ? `<div class="chips">${p.topicsList.slice(0, 3).map(t => `<button class="chip" data-topic="${esc(t)}">${esc(t)}</button>`).join("")}${p.topicsList.length > 3 ? `<span class="chip more">+${p.topicsList.length - 3}</span>` : ""}</div>` : ""}
+      <div class="card-foot">
+        <span class="links">${[p.portfolio && `<a href="${esc(url(p.portfolio))}" target="_blank" rel="noopener">Portfolio ↗</a>`, p.social && `<a href="${esc(url(p.social))}" target="_blank" rel="noopener">Social ↗</a>`].filter(Boolean).join("")}</span>
+        ${connectBtn(p)}
+      </div>
     </article>`;
 }
 
@@ -695,8 +704,8 @@ function eventCard(e) {
         <h3>${esc(e.title)}</h3>
         <div class="meta">${esc(e.organizer)}</div>
         <div class="meta">${[d && fmtDate(d, { weekday: "long" }), eTime(e), e.format].filter(Boolean).map(esc).join(" · ")}</div>
-        ${where ? `<div class="meta">📍 ${esc(where)}${e.region ? ` (${esc(e.region)})` : ""}</div>` : ""}
-        ${e.description ? `<p class="bio">${esc(e.description)}</p>` : ""}
+        ${where ? `<div class="meta oneline">📍 ${esc(where)}</div>` : ""}
+        ${e.description ? `<p class="bio clamp">${esc(e.description)}</p>` : ""}
         ${e.topicsList.length ? `<div class="chips">${e.topicsList.map(t => `<span class="chip">${esc(t)}</span>`).join("")}</div>` : ""}
         <div class="actions">${eventButtons(e)}</div>
         ${eventFine(e)}
@@ -854,7 +863,10 @@ const dlg = $("#connectDlg"), form = $("#connectForm");
 function openConnect(p) {
   target = p;
   $("#dlgTitle").textContent = "Connect with " + p.name;
-  $("#dlgSub").textContent = [p.role, p.org].filter(Boolean).join(" · ") + (p.openList.length ? " — open to " + p.openList.join(", ").toLowerCase() : "");
+  $("#dlgSub").innerHTML = esc([p.role, p.org, place(p)].filter(Boolean).join(" · "))
+    + (p.openList.length ? `<br><b>Open to:</b> ${esc(p.openList.join(", "))}` : "")
+    + (p.languages ? `<br><b>Languages:</b> ${esc(p.languages)}` : "")
+    + (p.email ? `<br><b>Email:</b> ${esc(p.email)}` : "");
   try { const saved = JSON.parse(localStorage.getItem("txenv-sender") || "{}"); form.fromName.value ||= saved.n || ""; form.fromEmail.value ||= saved.e || ""; form.fromOrg.value ||= saved.o || ""; } catch {}
   form.message.value = "";
   dlg.showModal();
@@ -881,7 +893,7 @@ form.addEventListener("submit", ev => {
 function toast(msg) { const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 2200); }
 
 /* ---------- Palette preview (prototype) ---------- */
-const PALETTES = { hillcountry: "Hill Country (sage)", gulf: "Gulf Coast (seafoam)", bluebonnet: "Bluebonnet (butter yellow)", bigbend: "Big Bend (desert clay)", bw: "Black & white" };
+const PALETTES = { hillcountry: "Hill Country (sage)", gulf: "Gulf Coast (seafoam)", bluebonnet: "Bluebonnet (butter yellow)", bigbend: "Big Bend (soft gray)", bw: "Black & white" };
 $("#palettePick").innerHTML = Object.entries(PALETTES).map(([k, v]) => `<option value="${k}">${v}</option>`).join("");
 let palette = new URLSearchParams(location.search).get("palette");
 if (!PALETTES[palette]) { try { palette = localStorage.getItem("txenv-palette"); } catch {} }
