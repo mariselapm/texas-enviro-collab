@@ -26,6 +26,8 @@
     --chip: #ececec;
     --chip-ink: #111111;
     --shadow: 0 1px 2px rgba(0,0,0,.05), 0 4px 16px rgba(0,0,0,.05);
+    --head-bg: #111111;
+    --head-ink: #ffffff;
     --head-font: Montserrat, system-ui, sans-serif;
     --body-font: Inter, system-ui, sans-serif;
   }
@@ -34,13 +36,13 @@
   a { color: var(--brand); }
   .wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
 
-  header.site { background: var(--brand); color: var(--brand-ink); }
+  header.site { background: var(--head-bg); color: var(--head-ink); }
   header.site .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding-top: 18px; padding-bottom: 18px; }
   .logo { font-family: var(--head-font); font-weight: 700; font-size: 22px; letter-spacing: -.01em; }
   .logo small { display: block; font: 400 13px var(--body-font); opacity: .85; }
   nav.tabs { display: flex; gap: 4px; flex-wrap: wrap; }
   nav.tabs button { background: transparent; color: inherit; border: 1px solid transparent; border-radius: 999px; padding: 8px 16px; font: 500 14px var(--body-font); cursor: pointer; opacity: .85; }
-  nav.tabs button[aria-selected="true"] { background: var(--brand-ink); color: var(--brand); opacity: 1; }
+  nav.tabs button[aria-selected="true"] { background: var(--head-ink); color: var(--head-bg); opacity: 1; }
   nav.tabs button:hover { opacity: 1; border-color: currentColor; }
 
   .hero { padding: 36px 0 12px; }
@@ -111,6 +113,30 @@
   .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 10px; font-size: 14px; opacity: 0; transition: opacity .2s; pointer-events: none; }
   .toast.show { opacity: 1; }
 
+  /* ---------- Color palettes (prototype: compare in the switcher bar) ----------
+     Same recipe as Grist (one soft signature color in the header, deep ink, one accent),
+     with different colors. */
+  body[data-palette="hillcountry"] {   /* soft sage + deep forest + terracotta */
+    --bg: #f6f4ee; --ink: #22302a; --muted: #5d6a62; --line: #e3e0d6;
+    --brand: #22302a; --brand-ink: #ffffff; --accent: #c0582f; --accent-ink: #ffffff;
+    --chip: #e3ecd9; --chip-ink: #22302a; --head-bg: #d5e5c5; --head-ink: #22302a;
+  }
+  body[data-palette="gulf"] {          /* seafoam + deep teal + marigold */
+    --bg: #f3f7f6; --ink: #10343a; --muted: #50676a; --line: #dbe6e4;
+    --brand: #10343a; --brand-ink: #ffffff; --accent: #f2b544; --accent-ink: #10343a;
+    --chip: #d6ecea; --chip-ink: #10343a; --head-bg: #c6e8e4; --head-ink: #10343a;
+  }
+  body[data-palette="bluebonnet"] {    /* butter yellow + indigo + bluebonnet blue */
+    --bg: #faf8f1; --ink: #1d2550; --muted: #5a5f7a; --line: #e8e4d6;
+    --brand: #1d2550; --brand-ink: #ffffff; --accent: #3f5bd0; --accent-ink: #ffffff;
+    --chip: #fbefc4; --chip-ink: #1d2550; --head-bg: #fbe9a6; --head-ink: #1d2550;
+  }
+  body[data-palette="bigbend"] {       /* desert clay + warm brown + cactus green */
+    --bg: #faf6f1; --ink: #3a2c26; --muted: #6d5f58; --line: #ebe0d6;
+    --brand: #3a2c26; --brand-ink: #ffffff; --accent: #3d7a55; --accent-ink: #ffffff;
+    --chip: #f3e2d3; --chip-ink: #3a2c26; --head-bg: #f2d9c4; --head-ink: #3a2c26;
+  }
+
   /* ---------- Prototype switcher bar ---------- */
   .viewbar { background: var(--surface); border-bottom: 1px solid var(--line); font-size: 13px; }
   .viewbar .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding-top: 10px; padding-bottom: 10px; }
@@ -119,7 +145,7 @@
   .seg button { font: 500 13px var(--body-font); background: var(--surface); color: var(--ink); border: 0; padding: 6px 12px; cursor: pointer; }
   .seg button + button { border-left: 1px solid var(--ink); }
   .seg button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
-  #fontPick { font: 13px var(--body-font); padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); }
+  #fontPick, #palettePick { font: 13px var(--body-font); padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); }
   .vb-check { display: inline-flex; align-items: center; gap: 4px; color: var(--muted); }
   #viewDesc { flex-basis: 100%; }
   .textlink { font: 600 14px var(--body-font); background: none; border: 0; padding: 0; color: var(--ink); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
@@ -190,7 +216,7 @@
   .cal-cell.out { background: var(--bg); color: var(--muted); }
   .cal-cell.today .cal-num { background: var(--ink); color: var(--surface); border-radius: 999px; padding: 0 7px; }
   .cal-num { font-size: 12px; font-weight: 600; align-self: flex-start; }
-  .cal-ev { font: 500 12px var(--body-font); text-align: left; background: var(--ink); color: var(--surface); border: 0; border-radius: 4px; padding: 3px 6px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cal-ev { font: 500 12px var(--body-font); text-align: left; background: var(--brand); color: var(--brand-ink); border: 0; border-radius: 4px; padding: 3px 6px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .cal-sub { font-family: var(--head-font); font-size: 16px; margin: 24px 0 12px; }
   @media (max-width: 600px) {
     .cal-cell { min-height: 54px; padding: 4px; }
@@ -199,12 +225,11 @@
 
   /* ---------- Editorial layout ---------- */
   body[data-view="editorial"] { --bg: #ffffff; --shadow: none; }
-  body[data-view="editorial"] header.site { background: #fff; color: var(--ink); border-bottom: 3px solid var(--ink); }
+  body[data-view="editorial"] header.site { border-bottom: 3px solid var(--ink); }
   body[data-view="editorial"] header.site .wrap { padding-top: 26px; }
   body[data-view="editorial"] .logo { font-size: 28px; text-transform: uppercase; letter-spacing: .02em; }
   body[data-view="editorial"] .logo small { text-transform: none; letter-spacing: 0; }
   body[data-view="editorial"] nav.tabs button { border-radius: 0; }
-  body[data-view="editorial"] nav.tabs button[aria-selected="true"] { background: var(--ink); color: #fff; }
   body[data-view="editorial"] .hero h1 { font-size: clamp(32px, 5vw, 52px); }
   body[data-view="editorial"] .toolbar input, body[data-view="editorial"] .toolbar select, body[data-view="editorial"] .btn { border-radius: 0; }
   body[data-view="editorial"] .toolbar input, body[data-view="editorial"] .toolbar select { border-color: var(--ink); }
@@ -245,6 +270,8 @@
   <div class="wrap">
     <span class="vb-label">Layout</span>
     <div class="seg" id="viewSwitch" role="group" aria-label="Choose a layout"></div>
+    <span class="vb-label">Palette</span>
+    <select id="palettePick" aria-label="Choose a color palette"></select>
     <span class="vb-label">Font</span>
     <select id="fontPick" aria-label="Choose a font"></select>
     <label class="vb-check"><input type="checkbox" id="fontAll"> Use for all text</label>
@@ -852,6 +879,19 @@ form.addEventListener("submit", ev => {
 });
 
 function toast(msg) { const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 2200); }
+
+/* ---------- Palette preview (prototype) ---------- */
+const PALETTES = { hillcountry: "Hill Country (sage)", gulf: "Gulf Coast (seafoam)", bluebonnet: "Bluebonnet (butter yellow)", bigbend: "Big Bend (desert clay)", bw: "Black & white" };
+$("#palettePick").innerHTML = Object.entries(PALETTES).map(([k, v]) => `<option value="${k}">${v}</option>`).join("");
+let palette = new URLSearchParams(location.search).get("palette");
+if (!PALETTES[palette]) { try { palette = localStorage.getItem("txenv-palette"); } catch {} }
+if (!PALETTES[palette]) palette = "hillcountry";
+function applyPalette(p) {
+  document.body.dataset.palette = p; $("#palettePick").value = p;
+  try { localStorage.setItem("txenv-palette", p); } catch {}
+}
+$("#palettePick").onchange = () => applyPalette($("#palettePick").value);
+applyPalette(palette);
 
 /* ---------- Font preview (prototype) ---------- */
 const FONTS = ["Montserrat", "Outfit", "Poppins", "Urbanist", "Raleway", "Plus Jakarta Sans"];
