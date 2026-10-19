@@ -64,6 +64,8 @@
   .meta { color: var(--muted); font-size: 13px; }
   .role { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
   .role::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex: none; }
+  .title-line { display: flex; align-items: baseline; gap: 8px; font-size: 14px; font-weight: 500; color: var(--ink); }
+  .title-line::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex: none; transform: translateY(-1px); }
   .clamp { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
   .oneline { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .pt-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
@@ -557,6 +559,14 @@ const initials = n => String(n).replace(/\(.*?\)/g, "").split(/\s+/).filter(w =>
   .slice(0, 2).map(w => w[0].toUpperCase()).join("");
 const firstName = n => String(n).replace(/\(.*?\)/g, "").trim().split(/\s+/).filter(w => !/^dr\.?$/i.test(w))[0] || "";
 const place = p => [p.city, p.region].filter(Boolean).join(", ");
+const cityTX = p => p.city ? p.city + ", TX" : (p.region || "");
+const bare = v => String(v || "").replace(/\(.*?\)/g, "").trim().toLowerCase();
+function titleLine(p) {
+  const org = String(p.org || "").trim();
+  if (!org || bare(org) === "independent") return [p.role, "Independent"].filter(Boolean).join(" – ");
+  if (bare(org) === bare(p.name)) return p.role || org;
+  return p.role ? `${p.role} from ${org}` : org;
+}
 const pIdx = p => state.people.indexOf(p);
 const linksHtml = p => [
   p.portfolio && `<a href="${esc(url(p.portfolio))}" target="_blank" rel="noopener">Portfolio ↗</a>`,
@@ -578,10 +588,10 @@ function personCard(p) {
         <div class="avatar" aria-hidden="true">${esc(initials(p.name))}</div>
         <div class="pt-text">
           <h3>${esc(p.name)}</h3>
-          <div class="meta oneline">${esc(p.org)}</div>
+          <div class="meta oneline">${esc(cityTX(p))}</div>
         </div>
       </div>
-      ${p.role || p.city ? `<span class="role">${[p.role, p.city].filter(Boolean).map(esc).join(" · ")}</span>` : ""}
+      <span class="title-line">${esc(titleLine(p))}</span>
       ${p.bio ? `<p class="bio clamp">${esc(p.bio)}</p>` : ""}
       ${p.topicsList.length ? `<div class="chips">${p.topicsList.slice(0, 3).map(t => `<button class="chip" data-topic="${esc(t)}">${esc(t)}</button>`).join("")}${p.topicsList.length > 3 ? `<span class="chip more">+${p.topicsList.length - 3}</span>` : ""}</div>` : ""}
       <div class="card-foot">
@@ -626,9 +636,9 @@ function personProfiles(list) {
       <div class="person-top">
         <div class="avatar lg" aria-hidden="true">${esc(initials(p.name))}</div>
         <div>
-          ${p.role ? `<span class="role">${esc(p.role)}</span>` : ""}
           <h2>${esc(p.name)}</h2>
-          <div class="meta">${[p.org, place(p)].filter(Boolean).map(esc).join(" · ")}</div>
+          <div class="meta">${esc(cityTX(p))}</div>
+          <span class="title-line">${esc(titleLine(p))}</span>
         </div>
       </div>
       ${p.bio ? `<p class="bio lead">${esc(p.bio)}</p>` : ""}
