@@ -1,5 +1,7 @@
 # Texas Environment Collab (prototype)
 
+**Live site:** https://mariselapm.github.io/texas-enviro-collab/
+
 A two-page website (People directory + Events calendar) that reads everything from one spreadsheet:
 `data/platform-data.xlsx`.
 
