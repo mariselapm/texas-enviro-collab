@@ -1,0 +1,877 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Texas Environment Collab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Urbanist:wght@400;500;600;700&family=Raleway:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  /* ============ SETTINGS: edit these ============ */
+  /* Site name, tagline and data source are set in the CONFIG block in the <script> below. */
+
+  :root {
+    /* Palette: black and white, with light grays for backgrounds and tags */
+    --bg: #f5f5f5;
+    --surface: #ffffff;
+    --ink: #111111;
+    --muted: #5f5f5f;
+    --line: #e2e2e2;
+    --brand: #111111;
+    --brand-ink: #ffffff;
+    --accent: #111111;
+    --accent-ink: #ffffff;
+    --chip: #ececec;
+    --chip-ink: #111111;
+    --shadow: 0 1px 2px rgba(0,0,0,.05), 0 4px 16px rgba(0,0,0,.05);
+    --head-font: Montserrat, system-ui, sans-serif;
+    --body-font: Inter, system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body-font); }
+  a { color: var(--brand); }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+
+  header.site { background: var(--brand); color: var(--brand-ink); }
+  header.site .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding-top: 18px; padding-bottom: 18px; }
+  .logo { font-family: var(--head-font); font-weight: 700; font-size: 22px; letter-spacing: -.01em; }
+  .logo small { display: block; font: 400 13px var(--body-font); opacity: .85; }
+  nav.tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+  nav.tabs button { background: transparent; color: inherit; border: 1px solid transparent; border-radius: 999px; padding: 8px 16px; font: 500 14px var(--body-font); cursor: pointer; opacity: .85; }
+  nav.tabs button[aria-selected="true"] { background: var(--brand-ink); color: var(--brand); opacity: 1; }
+  nav.tabs button:hover { opacity: 1; border-color: currentColor; }
+
+  .hero { padding: 36px 0 12px; }
+  .hero h1 { font-family: var(--head-font); font-size: clamp(26px, 4vw, 38px); line-height: 1.15; margin: 0 0 8px; letter-spacing: -.015em; }
+  .hero p { color: var(--muted); max-width: 680px; margin: 0; }
+
+  .toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin: 22px 0 10px; }
+  .toolbar input, .toolbar select { font: inherit; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); min-width: 0; }
+  .toolbar input[type=search] { flex: 1 1 260px; }
+  .toolbar select { flex: 0 1 200px; }
+  .toolbar label.check { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 14px; }
+  .count { color: var(--muted); font-size: 13px; margin: 6px 0 16px; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; padding-bottom: 48px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px; }
+  .person-top { display: flex; gap: 12px; align-items: center; }
+  .avatar { flex: none; width: 46px; height: 46px; border-radius: 50%; background: var(--chip); color: var(--chip-ink); display: grid; place-items: center; font-weight: 600; font-size: 16px; }
+  .card h3 { margin: 0; font-size: 17px; line-height: 1.25; }
+  .meta { color: var(--muted); font-size: 13px; }
+  .role { display: inline-block; align-self: flex-start; font-size: 11px; font-weight: 600; background: var(--accent); color: var(--accent-ink); border-radius: 6px; padding: 1px 8px; margin-bottom: 3px; text-transform: uppercase; letter-spacing: .04em; }
+  .bio { margin: 0; font-size: 14px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { background: var(--chip); color: var(--chip-ink); border-radius: 999px; padding: 2px 10px; font-size: 12px; cursor: pointer; border: 0; font-family: inherit; }
+  .opento { font-size: 13px; color: var(--muted); }
+  .opento b { color: var(--ink); font-weight: 600; }
+  .links { display: flex; flex-wrap: wrap; gap: 12px; font-size: 13px; }
+  .card .actions { margin-top: auto; display: flex; gap: 8px; padding-top: 4px; }
+  .btn { font: 600 14px var(--body-font); border-radius: 10px; padding: 10px 16px; border: 1px solid var(--brand); background: var(--brand); color: var(--brand-ink); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+  .btn.ghost { background: transparent; color: var(--brand); }
+  .btn:hover { opacity: .85; }
+  .actions .btn { flex: 1; white-space: nowrap; }
+  .card .actions { flex-wrap: wrap; }
+
+  .event { flex-direction: row; gap: 16px; }
+  .datebox { flex: none; width: 64px; text-align: center; border-radius: 10px; background: var(--chip); color: var(--chip-ink); padding: 8px 0; align-self: flex-start; }
+  .datebox .m { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+  .datebox .d { font-family: var(--head-font); font-size: 26px; font-weight: 700; line-height: 1.1; }
+  .datebox .y { font-size: 11px; opacity: .8; }
+  .event-body { display: flex; flex-direction: column; gap: 8px; min-width: 0; flex: 1; }
+  .event.past { opacity: .6; }
+  .events-grid { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); }
+
+  .empty, .notice { background: var(--surface); border: 1px dashed var(--line); border-radius: 14px; padding: 28px; text-align: center; color: var(--muted); grid-column: 1 / -1; }
+  .notice { text-align: left; border-style: solid; }
+  .notice code { background: var(--chip); padding: 1px 6px; border-radius: 6px; }
+
+  .about { max-width: 720px; padding-bottom: 60px; }
+  .about h2 { font-family: var(--head-font); font-size: 22px; margin: 28px 0 8px; }
+  .about ol li, .about ul li { margin-bottom: 6px; }
+
+  footer { border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; padding: 18px 0 28px; }
+  footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 18px; justify-content: space-between; align-items: center; }
+  footer button { font: inherit; background: none; border: 0; color: var(--brand); cursor: pointer; padding: 0; text-decoration: underline; }
+
+  /* Connect dialog */
+  dialog { border: 0; border-radius: 16px; padding: 0; width: min(560px, calc(100vw - 32px)); background: var(--surface); color: var(--ink); box-shadow: 0 20px 60px rgba(0,0,0,.3); }
+  dialog::backdrop { background: rgba(20,26,22,.5); }
+  .dlg-head { padding: 20px 22px 0; }
+  .dlg-head h2 { margin: 0; font-family: var(--head-font); font-size: 22px; }
+  .dlg-body { padding: 14px 22px 4px; display: grid; gap: 12px; }
+  .dlg-body label { display: grid; gap: 4px; font-size: 13px; font-weight: 600; }
+  .dlg-body input, .dlg-body select, .dlg-body textarea { font: 400 14px var(--body-font); padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--ink); width: 100%; }
+  .dlg-body textarea { min-height: 130px; resize: vertical; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 520px) { .row2 { grid-template-columns: 1fr; } .event { flex-direction: column; } }
+  .dlg-foot { padding: 14px 22px 20px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+  .hint { font-size: 12px; color: var(--muted); font-weight: 400; }
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 10px; font-size: 14px; opacity: 0; transition: opacity .2s; pointer-events: none; }
+  .toast.show { opacity: 1; }
+
+  /* ---------- Prototype switcher bar ---------- */
+  .viewbar { background: var(--surface); border-bottom: 1px solid var(--line); font-size: 13px; }
+  .viewbar .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding-top: 10px; padding-bottom: 10px; }
+  .vb-label { font-weight: 600; text-transform: uppercase; letter-spacing: .06em; font-size: 11px; color: var(--muted); }
+  .seg { display: inline-flex; border: 1px solid var(--ink); border-radius: 8px; overflow: hidden; }
+  .seg button { font: 500 13px var(--body-font); background: var(--surface); color: var(--ink); border: 0; padding: 6px 12px; cursor: pointer; }
+  .seg button + button { border-left: 1px solid var(--ink); }
+  .seg button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
+  #fontPick { font: 13px var(--body-font); padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); }
+  .vb-check { display: inline-flex; align-items: center; gap: 4px; color: var(--muted); }
+  #viewDesc { flex-basis: 100%; }
+  .textlink { font: 600 14px var(--body-font); background: none; border: 0; padding: 0; color: var(--ink); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+  .card.flash { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+  /* ---------- Directory layout ---------- */
+  .view-directory { padding-bottom: 48px; }
+  .dir, .agenda { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .dir-head, .dir-row summary { display: grid; grid-template-columns: 1.3fr 1.4fr 1.6fr 104px; gap: 16px; align-items: center; padding: 12px 16px; }
+  .dir-head { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); border-bottom: 1px solid var(--line); background: var(--bg); }
+  .dir-row, .agenda-row { border-bottom: 1px solid var(--line); }
+  .dir-row:last-child { border-bottom: 0; }
+  .dir-row summary, .agenda-row summary { cursor: pointer; list-style: none; }
+  .dir-row summary::-webkit-details-marker, .agenda-row summary::-webkit-details-marker { display: none; }
+  .dir-row summary:hover, .agenda-row summary:hover { background: var(--bg); }
+  .dir-row[open] summary, .agenda-row[open] summary { background: var(--bg); }
+  .c-name, .c-org, .a-date, .a-main { display: flex; flex-direction: column; min-width: 0; }
+  .c-topics { font-size: 13px; color: var(--muted); }
+  .c-act .btn, .a-act .btn { padding: 7px 14px; font-size: 13px; white-space: nowrap; }
+  .dir-more { padding: 4px 16px 16px; display: grid; gap: 8px; background: var(--bg); }
+  .dir-more .actions { display: flex; gap: 8px; }
+  .agenda { border-radius: 12px; }
+  .agenda-month { font-family: var(--head-font); font-size: 15px; margin: 0; padding: 14px 16px 10px; border-bottom: 1px solid var(--ink); background: var(--surface); }
+  .agenda-row summary { display: grid; grid-template-columns: 90px 1fr 200px auto; gap: 16px; align-items: center; padding: 12px 16px; }
+  .agenda-row.past { opacity: .6; }
+  @media (max-width: 760px) {
+    .dir-head { display: none; }
+    .dir-row summary { grid-template-columns: 1fr auto; }
+    .dir-row .c-org, .dir-row .c-topics { grid-column: 1; }
+    .dir-row .c-act { grid-row: 1; grid-column: 2; }
+    .agenda-row summary { grid-template-columns: 70px 1fr; }
+    .agenda-row .a-where, .agenda-row .a-act { grid-column: 2; }
+  }
+
+  /* ---------- Profiles layout ---------- */
+  .view-profiles { padding-bottom: 48px; }
+  .split { display: grid; grid-template-columns: 300px 1fr; gap: 20px; align-items: start; }
+  .split-list { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: auto; max-height: 75vh; position: sticky; top: 16px; }
+  .split-item { display: flex; gap: 10px; align-items: center; width: 100%; text-align: left; background: none; border: 0; border-bottom: 1px solid var(--line); padding: 12px 14px; font: inherit; color: inherit; cursor: pointer; }
+  .split-item span:last-child { display: flex; flex-direction: column; min-width: 0; }
+  .split-item:hover { background: var(--bg); }
+  .split-item[aria-current="true"] { background: var(--ink); color: var(--surface); }
+  .split-item[aria-current="true"] .meta { color: inherit; opacity: .75; }
+  .split-item[aria-current="true"] .avatar { background: var(--surface); color: var(--ink); }
+  .avatar.sm { width: 34px; height: 34px; font-size: 13px; }
+  .avatar.lg { width: 72px; height: 72px; font-size: 24px; }
+  .split-detail { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 28px; display: grid; gap: 18px; }
+  .split-detail h2 { font-family: var(--head-font); font-size: 28px; margin: 0; line-height: 1.2; }
+  .bio.lead { font-size: 16px; }
+  .facts { display: grid; grid-template-columns: 120px 1fr; gap: 12px 16px; margin: 0; padding-top: 16px; border-top: 1px solid var(--line); }
+  .facts dt { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); padding-top: 3px; }
+  .facts dd { margin: 0; }
+  .split-detail .actions .btn { padding: 12px 22px; }
+  @media (max-width: 760px) {
+    .split { grid-template-columns: 1fr; }
+    .split-list { position: static; max-height: 300px; }
+    .facts { grid-template-columns: 1fr; gap: 4px; }
+    .facts dd { margin-bottom: 8px; }
+  }
+
+  /* Calendar (Events in Profiles layout) */
+  .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .cal-nav h2 { font-family: var(--head-font); font-size: 22px; margin: 0; }
+  .cal-nav .btn { padding: 6px 14px; font-size: 18px; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); background: var(--line); gap: 1px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .cal-dow { background: var(--bg); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); padding: 8px; }
+  .cal-cell { background: var(--surface); min-height: 96px; padding: 6px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .cal-cell.out { background: var(--bg); color: var(--muted); }
+  .cal-cell.today .cal-num { background: var(--ink); color: var(--surface); border-radius: 999px; padding: 0 7px; }
+  .cal-num { font-size: 12px; font-weight: 600; align-self: flex-start; }
+  .cal-ev { font: 500 12px var(--body-font); text-align: left; background: var(--ink); color: var(--surface); border: 0; border-radius: 4px; padding: 3px 6px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cal-sub { font-family: var(--head-font); font-size: 16px; margin: 24px 0 12px; }
+  @media (max-width: 600px) {
+    .cal-cell { min-height: 54px; padding: 4px; }
+    .cal-ev { font-size: 0; height: 8px; padding: 0; border-radius: 999px; }
+  }
+
+  /* ---------- Editorial layout ---------- */
+  body[data-view="editorial"] { --bg: #ffffff; --shadow: none; }
+  body[data-view="editorial"] header.site { background: #fff; color: var(--ink); border-bottom: 3px solid var(--ink); }
+  body[data-view="editorial"] header.site .wrap { padding-top: 26px; }
+  body[data-view="editorial"] .logo { font-size: 28px; text-transform: uppercase; letter-spacing: .02em; }
+  body[data-view="editorial"] .logo small { text-transform: none; letter-spacing: 0; }
+  body[data-view="editorial"] nav.tabs button { border-radius: 0; }
+  body[data-view="editorial"] nav.tabs button[aria-selected="true"] { background: var(--ink); color: #fff; }
+  body[data-view="editorial"] .hero h1 { font-size: clamp(32px, 5vw, 52px); }
+  body[data-view="editorial"] .toolbar input, body[data-view="editorial"] .toolbar select, body[data-view="editorial"] .btn { border-radius: 0; }
+  body[data-view="editorial"] .toolbar input, body[data-view="editorial"] .toolbar select { border-color: var(--ink); }
+  .kicker { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+  .ed-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); column-gap: 40px; padding-bottom: 48px; border-top: 1px solid var(--ink); }
+  .ed-item { padding: 22px 0; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px; }
+  .ed-item h3, .ed-event h3 { font-family: var(--head-font); font-size: 24px; line-height: 1.2; margin: 2px 0 0; }
+  .ed-item p, .ed-event p { margin: 6px 0 0; }
+  .ed-line { font-size: 14px; }
+  .ed-line b { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; margin-right: 6px; }
+  .ed-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-top: 10px; font-size: 13px; }
+  .ed-foot .links { display: flex; gap: 12px; flex-wrap: wrap; }
+  .ed-events { border-top: 1px solid var(--ink); padding-bottom: 48px; }
+  .ed-event { display: grid; grid-template-columns: 120px 1fr; gap: 24px; padding: 26px 0; border-bottom: 1px solid var(--line); }
+  .ed-event.past { opacity: .55; }
+  .ed-date { display: flex; flex-direction: column; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+  .ed-day { font-family: var(--head-font); font-size: 56px; line-height: 1; letter-spacing: -.02em; }
+  .ed-event .ed-foot { justify-content: flex-start; gap: 20px; }
+  @media (max-width: 600px) { .ed-event { grid-template-columns: 1fr; gap: 8px; } .ed-day { font-size: 40px; } }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <div class="logo"><span id="siteName"></span><small id="siteTagline"></small></div>
+    <nav class="tabs" role="tablist">
+      <button role="tab" data-tab="people" aria-selected="true">People</button>
+      <button role="tab" data-tab="events" aria-selected="false">Events</button>
+      <button role="tab" data-tab="about" aria-selected="false">About</button>
+    </nav>
+  </div>
+</header>
+
+<!-- Prototype-only bar for comparing layouts and fonts. Remove once the group picks one. -->
+<div class="viewbar">
+  <div class="wrap">
+    <span class="vb-label">Layout</span>
+    <div class="seg" id="viewSwitch" role="group" aria-label="Choose a layout"></div>
+    <span class="vb-label">Font</span>
+    <select id="fontPick" aria-label="Choose a font"></select>
+    <label class="vb-check"><input type="checkbox" id="fontAll"> Use for all text</label>
+    <span class="meta" id="viewDesc"></span>
+  </div>
+</div>
+
+<main class="wrap">
+  <!-- PEOPLE -->
+  <section id="tab-people">
+    <div class="hero">
+      <h1>Find someone to cover Texas's environment with.</h1>
+      <p>Reporters, newsrooms, creators and educators across Texas who've said they're open to collaborating. Filter by region or topic, then reach out with a pitch.</p>
+    </div>
+    <div class="toolbar">
+      <input type="search" id="pSearch" placeholder="Search names, organizations, topics…" aria-label="Search people">
+      <select id="pRole" aria-label="Filter by role"><option value="">All roles</option></select>
+      <select id="pRegion" aria-label="Filter by region"><option value="">All regions</option></select>
+      <select id="pTopic" aria-label="Filter by topic"><option value="">All topics</option></select>
+    </div>
+    <div class="count" id="pCount"></div>
+    <div class="grid" id="peopleGrid"></div>
+  </section>
+
+  <!-- EVENTS -->
+  <section id="tab-events" hidden>
+    <div class="hero">
+      <h1>Environmental events across Texas.</h1>
+      <p>Workshops, town halls and trainings from newsrooms, community groups, schools and agencies, all in one calendar.</p>
+    </div>
+    <div class="toolbar">
+      <input type="search" id="eSearch" placeholder="Search events, organizers, topics…" aria-label="Search events">
+      <select id="eRegion" aria-label="Filter by region"><option value="">All regions</option></select>
+      <select id="eType" aria-label="Filter by organizer type"><option value="">All organizers</option></select>
+      <select id="eFormat" aria-label="Filter by format"><option value="">Any format</option></select>
+      <label class="check"><input type="checkbox" id="ePast"> Show past events</label>
+    </div>
+    <div class="count" id="eCount"></div>
+    <div class="grid events-grid" id="eventsGrid"></div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="tab-about" hidden>
+    <div class="about">
+      <div class="hero" style="padding-left:0">
+        <h1>About this project</h1>
+        <p>A prototype built by journalism students to connect the people covering Texas's environment: news organizations, creators, educators and reporters. We'd love your feedback.</p>
+      </div>
+      <h2>How connecting works</h2>
+      <p>Click <b>Connect</b> on anyone's card, fill in a short pitch, and your own email app opens with a ready-to-send message addressed to them. Nothing is stored on this site.</p>
+      <h2>Want to be listed?</h2>
+      <p>Everyone in the directory has agreed to be included. To join, or to add an event, email us at <a id="joinLink" href="#"></a>.</p>
+      <h2>How the data is kept up to date</h2>
+      <p>The whole site is powered by one spreadsheet (<code>platform-data.xlsx</code>) with a <b>Contacts</b> tab and an <b>Events</b> tab. When the team edits and saves it, the site shows the changes the next time it loads.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span id="dataStatus">Loading data…</span>
+    <span><button id="reloadBtn" type="button">Refresh data</button> · <label style="cursor:pointer"><button type="button" id="pickBtn">Load a spreadsheet file</button><input type="file" id="filePick" accept=".xlsx,.xls,.csv" hidden></label></span>
+  </div>
+</footer>
+
+<!-- Connect dialog -->
+<dialog id="connectDlg">
+  <form method="dialog" id="connectForm">
+    <div class="dlg-head">
+      <h2 id="dlgTitle">Connect</h2>
+      <div class="meta" id="dlgSub"></div>
+    </div>
+    <div class="dlg-body">
+      <div class="row2">
+        <label>Your name <input name="fromName" required autocomplete="name"></label>
+        <label>Your email <input name="fromEmail" type="email" required autocomplete="email"></label>
+      </div>
+      <div class="row2">
+        <label>Your organization <span class="hint">(optional)</span><input name="fromOrg" autocomplete="organization"></label>
+        <label>What are you proposing?
+          <select name="kind">
+            <option>Story pitch</option>
+            <option>Co-reporting / collaboration</option>
+            <option>Interview or expert source</option>
+            <option>Event or workshop</option>
+            <option>Sharing data or resources</option>
+            <option>Something else</option>
+          </select>
+        </label>
+      </div>
+      <label>Your pitch
+        <textarea name="message" required placeholder="What's the story or project, why them, and what you're hoping for (timeline, format, etc.)"></textarea>
+      </label>
+      <div class="hint">"Open email" starts a draft in your own email app. You can review it before sending.</div>
+    </div>
+    <div class="dlg-foot">
+      <button type="button" class="btn ghost" id="dlgCancel">Cancel</button>
+      <button type="button" class="btn ghost" id="dlgCopy">Copy email address</button>
+      <button type="submit" class="btn" id="dlgSend">Open email ✉</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ======================= CONFIG ======================= */
+const CONFIG = {
+  siteName: "Texas Environment Collab",
+  tagline: "Connecting the people who cover Texas's environment",
+  // Where the spreadsheet lives. Default: the file in the data/ folder next to this page.
+  // To use a shared online sheet instead, paste a published-to-web link here, e.g. Google Sheets:
+  // File → Share → Publish to web → Entire document → Microsoft Excel (.xlsx) → copy link.
+  dataUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSCfG0pEa72aPvsULvnVMF3zUEg06sEH5BQlGQLXEYZ6cSI6Z-LVlVr4V34yDPVfg/pub?output=xlsx",
+  // Previous local file (no longer used): "data/platform-data.xlsx"
+  contactsSheet: "Contacts",
+  eventsSheet: "Events",
+  teamEmail: "team@example.com",       // shown on the About page for people who want to join
+  emailSubjectPrefix: "[Texas Environment Collab]",
+  autoRefreshMinutes: 5                 // re-read the spreadsheet in the background
+};
+/* ====================================================== */
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const state = { people: [], events: [], loaded: false };
+
+$("#siteName").textContent = CONFIG.siteName;
+$("#siteTagline").textContent = CONFIG.tagline;
+document.title = CONFIG.siteName;
+$("#joinLink").textContent = CONFIG.teamEmail;
+$("#joinLink").href = "mailto:" + CONFIG.teamEmail;
+
+/* ---------- Tabs ---------- */
+function showTab(name) {
+  document.querySelectorAll("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === name));
+  ["people", "events", "about"].forEach(t => $("#tab-" + t).hidden = t !== name);
+  history.replaceState(null, "", "#" + name);
+}
+document.querySelectorAll("nav.tabs button").forEach(b => b.onclick = () => showTab(b.dataset.tab));
+if (["#events", "#about"].includes(location.hash)) showTab(location.hash.slice(1));
+
+/* ---------- Reading the spreadsheet ---------- */
+// Header matching is forgiving: case, spaces and anything in (parentheses) are ignored,
+// so "Listed (Yes/No)", "listed" and "LISTED" all work.
+const norm = h => String(h).toLowerCase().replace(/\(.*?\)/g, "").replace(/[^a-z0-9]/g, "");
+const FIELDS = {
+  listed: ["listed", "published", "show", "consent"],
+  name: ["name", "fullname"], role: ["role", "type"], org: ["organization", "org", "outlet", "affiliation"],
+  city: ["city"], region: ["region"], topics: ["beatstopics", "beats", "topics", "topic"],
+  email: ["email", "emailaddress"], portfolio: ["portfoliowebsite", "portfolio", "website"],
+  social: ["socialmedia", "social", "sociallink"], languages: ["languages", "language"],
+  openTo: ["opento", "interestedin"], bio: ["bio", "about"], description: ["description", "details"],
+  title: ["eventtitle", "title", "event"], organizer: ["organizer", "host"],
+  orgType: ["organizertype"], date: ["date", "eventdate"], start: ["starttime", "start", "time"],
+  end: ["endtime", "end"], format: ["format"], venue: ["venueaddress", "venue", "address", "location"],
+  link: ["registrationlink", "registration", "link", "url"], cost: ["cost", "price"],
+  contactEmail: ["contactemail"]
+};
+function mapRow(raw) {
+  const byKey = {};
+  for (const [k, v] of Object.entries(raw)) byKey[norm(k)] = v;
+  const out = {};
+  for (const [field, aliases] of Object.entries(FIELDS)) {
+    const hit = aliases.find(a => byKey[a] !== undefined && byKey[a] !== "");
+    out[field] = hit ? byKey[hit] : "";
+  }
+  return out;
+}
+const isYes = v => v === "" || /^(y|yes|true|1|x)$/i.test(String(v).trim());
+const splitList = v => String(v || "").split(/[,;\n]/).map(s => s.trim()).filter(Boolean);
+const url = v => { v = String(v || "").trim(); if (!v) return ""; return /^https?:\/\//i.test(v) ? v : "https://" + v; };
+
+function toDate(v) {
+  if (v instanceof Date) return new Date(v.getFullYear(), v.getMonth(), v.getDate());
+  if (typeof v === "number") { const d = XLSX.SSF.parse_date_code(v); return new Date(d.y, d.m - 1, d.d); }
+  const d = new Date(v); return isNaN(d) ? null : d;
+}
+
+function sheetRows(wb, wanted) {
+  const name = wb.SheetNames.find(n => n.trim().toLowerCase() === wanted.toLowerCase());
+  if (!name) return null;
+  return XLSX.utils.sheet_to_json(wb.Sheets[name], { defval: "", raw: true });
+}
+
+function ingest(wb, sourceLabel) {
+  const c = sheetRows(wb, CONFIG.contactsSheet), e = sheetRows(wb, CONFIG.eventsSheet);
+  const missing = [!c && CONFIG.contactsSheet, !e && CONFIG.eventsSheet].filter(Boolean);
+  state.people = (c || []).map(mapRow).filter(r => r.name && isYes(r.listed))
+    .map(r => ({ ...r, topicsList: splitList(r.topics), openList: splitList(r.openTo) }))
+    .sort((a, b) => String(a.name).localeCompare(String(b.name)));
+  state.events = (e || []).map(mapRow).filter(r => r.title && isYes(r.listed))
+    .map(r => ({ ...r, dateObj: toDate(r.date), topicsList: splitList(r.topics) }))
+    .sort((a, b) => (a.dateObj || 0) - (b.dateObj || 0));
+  state.loaded = true;
+  buildFilters();
+  renderPeople(); renderEvents();
+  const when = new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  $("#dataStatus").textContent = `${state.people.length} people · ${state.events.length} events · from ${sourceLabel} · updated ${when}`
+    + (missing.length ? ` · ⚠ missing tab: ${missing.join(", ")}` : "");
+}
+
+async function loadFromUrl() {
+  try {
+    const sep = CONFIG.dataUrl.includes("?") ? "&" : "?";
+    const res = await fetch(CONFIG.dataUrl + sep + "v=" + Date.now(), { cache: "no-store" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const wb = XLSX.read(await res.arrayBuffer(), { type: "array", cellDates: true });
+    ingest(wb, CONFIG.dataUrl.startsWith("http") ? "online spreadsheet" : CONFIG.dataUrl.split("/").pop());
+  } catch (err) {
+    console.error(err);
+    if (!state.people.length && !state.events.length) {
+      const msg = `<div class="notice"><b>Couldn't load the spreadsheet.</b><br>
+        If you opened this page by double-clicking <code>index.html</code>, browsers block it from reading files.
+        Start it with <code>start.command</code> (Mac) instead, or use <b>Load a spreadsheet file</b> at the bottom of the page.
+        <br><span class="meta">Details: ${esc(err.message)}</span></div>`;
+      $("#peopleGrid").innerHTML = msg; $("#eventsGrid").innerHTML = msg;
+    }
+    $("#dataStatus").textContent = "Couldn't load " + CONFIG.dataUrl;
+  }
+}
+$("#reloadBtn").onclick = () => { loadFromUrl(); toast("Refreshing from spreadsheet…"); };
+$("#pickBtn").onclick = () => $("#filePick").click();
+$("#filePick").onchange = async ev => {
+  const f = ev.target.files[0]; if (!f) return;
+  ingest(XLSX.read(await f.arrayBuffer(), { type: "array", cellDates: true }), f.name);
+  toast("Loaded " + f.name);
+};
+
+/* ---------- Filters ---------- */
+function fillSelect(sel, values) {
+  const keep = sel.value, first = sel.options[0].outerHTML;
+  sel.innerHTML = first + [...new Set(values.filter(Boolean).map(v => String(v).trim()))]
+    .sort((a, b) => a.localeCompare(b)).map(v => `<option>${esc(v)}</option>`).join("");
+  sel.value = [...sel.options].some(o => o.value === keep) ? keep : "";
+}
+function buildFilters() {
+  fillSelect($("#pRole"), state.people.map(p => p.role));
+  fillSelect($("#pRegion"), state.people.map(p => p.region));
+  fillSelect($("#pTopic"), state.people.flatMap(p => p.topicsList));
+  fillSelect($("#eRegion"), state.events.map(e => e.region));
+  fillSelect($("#eType"), state.events.map(e => e.orgType));
+  fillSelect($("#eFormat"), state.events.map(e => e.format));
+}
+["#pSearch", "#pRole", "#pRegion", "#pTopic"].forEach(s => $(s).addEventListener("input", renderPeople));
+["#eSearch", "#eRegion", "#eType", "#eFormat", "#ePast"].forEach(s => $(s).addEventListener("input", renderEvents));
+const matches = (obj, q) => !q || Object.values(obj).join(" ").toLowerCase().includes(q);
+
+/* ---------- Layouts (prototype: compare different ways to show the same data) ---------- */
+const VIEWS = {
+  cards: ["Cards", "Visual cards, good for browsing."],
+  directory: ["Directory", "Compact rows that are quick to scan. Click a row for details. Events show as an agenda."],
+  profiles: ["Profiles", "Pick a name to read the full profile. Events show as a month calendar."],
+  editorial: ["Editorial", "Newspaper-style layout: thin rules instead of boxes, bigger type."]
+};
+let view = new URLSearchParams(location.search).get("view");
+if (!VIEWS[view]) { try { view = localStorage.getItem("txenv-view"); } catch {} }
+if (!VIEWS[view]) view = "cards";
+
+$("#viewSwitch").innerHTML = Object.entries(VIEWS).map(([k, [label]]) => `<button type="button" data-view="${k}">${label}</button>`).join("");
+$("#viewSwitch").onclick = ev => { const b = ev.target.closest("[data-view]"); if (b) setView(b.dataset.view); };
+function setView(v) {
+  view = v;
+  document.body.dataset.view = v;
+  document.querySelectorAll("#viewSwitch button").forEach(b => b.setAttribute("aria-pressed", b.dataset.view === v));
+  $("#viewDesc").textContent = VIEWS[v][1];
+  try { localStorage.setItem("txenv-view", v); } catch {}
+  history.replaceState(null, "", "?view=" + v + location.hash);
+  renderPeople(); renderEvents();
+}
+
+/* ---------- People ---------- */
+const initials = n => String(n).replace(/\(.*?\)/g, "").split(/\s+/).filter(w => /^[A-Za-zÀ-ÿ]/.test(w) && !/^dr\.?$/i.test(w))
+  .slice(0, 2).map(w => w[0].toUpperCase()).join("");
+const firstName = n => String(n).replace(/\(.*?\)/g, "").trim().split(/\s+/).filter(w => !/^dr\.?$/i.test(w))[0] || "";
+const place = p => [p.city, p.region].filter(Boolean).join(", ");
+const pIdx = p => state.people.indexOf(p);
+const linksHtml = p => [
+  p.portfolio && `<a href="${esc(url(p.portfolio))}" target="_blank" rel="noopener">Portfolio ↗</a>`,
+  p.social && `<a href="${esc(url(p.social))}" target="_blank" rel="noopener">Social ↗</a>`,
+  p.email && `<a href="mailto:${esc(p.email)}">${esc(p.email)}</a>`].filter(Boolean).join("");
+const connectBtn = (p, label = "Connect", cls = "btn") =>
+  p.email ? `<button class="${cls}" data-connect="${pIdx(p)}">${label}</button>` : `<span class="meta">No email listed</span>`;
+
+function filteredPeople() {
+  const q = $("#pSearch").value.trim().toLowerCase(), role = $("#pRole").value, region = $("#pRegion").value, topic = $("#pTopic").value;
+  return state.people.filter(p => matches(p, q) && (!role || p.role === role) && (!region || p.region === region)
+    && (!topic || p.topicsList.includes(topic)));
+}
+
+function personCard(p) {
+  return `
+    <article class="card">
+      <div class="person-top">
+        <div class="avatar" aria-hidden="true">${esc(initials(p.name))}</div>
+        <div>
+          ${p.role ? `<span class="role">${esc(p.role)}</span>` : ""}
+          <h3>${esc(p.name)}</h3>
+          <div class="meta">${[p.org, place(p)].filter(Boolean).map(esc).join(" · ")}</div>
+        </div>
+      </div>
+      ${p.bio ? `<p class="bio">${esc(p.bio)}</p>` : ""}
+      ${p.topicsList.length ? `<div class="chips">${p.topicsList.map(t => `<button class="chip" data-topic="${esc(t)}">${esc(t)}</button>`).join("")}</div>` : ""}
+      ${p.openList.length ? `<div class="opento"><b>Open to:</b> ${p.openList.map(esc).join(", ")}</div>` : ""}
+      ${p.languages ? `<div class="opento"><b>Languages:</b> ${esc(p.languages)}</div>` : ""}
+      <div class="links">${linksHtml(p)}</div>
+      <div class="actions">${connectBtn(p)}</div>
+    </article>`;
+}
+
+function personDirectory(list) {
+  return `<div class="dir">
+    <div class="dir-head"><span>Name</span><span>Organization &amp; location</span><span>Covers</span><span></span></div>
+    ${list.map(p => `
+    <details class="dir-row">
+      <summary>
+        <span class="c-name"><b>${esc(p.name)}</b><span class="meta">${esc(p.role)}</span></span>
+        <span class="c-org">${esc(p.org)}<span class="meta">${esc(place(p))}</span></span>
+        <span class="c-topics">${p.topicsList.map(esc).join(", ")}</span>
+        <span class="c-act">${connectBtn(p)}</span>
+      </summary>
+      <div class="dir-more">
+        ${p.bio ? `<p class="bio">${esc(p.bio)}</p>` : ""}
+        ${p.openList.length ? `<div class="opento"><b>Open to:</b> ${p.openList.map(esc).join(", ")}</div>` : ""}
+        ${p.languages ? `<div class="opento"><b>Languages:</b> ${esc(p.languages)}</div>` : ""}
+        <div class="links">${linksHtml(p)}</div>
+      </div>
+    </details>`).join("")}
+  </div>`;
+}
+
+function personProfiles(list) {
+  if (!list.includes(state.people[state.sel])) state.sel = pIdx(list[0]);
+  const p = state.people[state.sel];
+  return `<div class="split">
+    <div class="split-list">
+      ${list.map(x => `<button class="split-item" data-sel="${pIdx(x)}" aria-current="${x === p}">
+        <span class="avatar sm" aria-hidden="true">${esc(initials(x.name))}</span>
+        <span><b>${esc(x.name)}</b><span class="meta">${[x.role, x.region].filter(Boolean).map(esc).join(" · ")}</span></span>
+      </button>`).join("")}
+    </div>
+    <article class="split-detail" id="profileDetail">
+      <div class="person-top">
+        <div class="avatar lg" aria-hidden="true">${esc(initials(p.name))}</div>
+        <div>
+          ${p.role ? `<span class="role">${esc(p.role)}</span>` : ""}
+          <h2>${esc(p.name)}</h2>
+          <div class="meta">${[p.org, place(p)].filter(Boolean).map(esc).join(" · ")}</div>
+        </div>
+      </div>
+      ${p.bio ? `<p class="bio lead">${esc(p.bio)}</p>` : ""}
+      <dl class="facts">
+        ${p.topicsList.length ? `<dt>Covers</dt><dd><div class="chips">${p.topicsList.map(t => `<button class="chip" data-topic="${esc(t)}">${esc(t)}</button>`).join("")}</div></dd>` : ""}
+        ${p.openList.length ? `<dt>Open to</dt><dd>${p.openList.map(esc).join(", ")}</dd>` : ""}
+        ${p.languages ? `<dt>Languages</dt><dd>${esc(p.languages)}</dd>` : ""}
+        <dt>Links</dt><dd><div class="links">${linksHtml(p) || "—"}</div></dd>
+      </dl>
+      <div class="actions">${connectBtn(p, "Connect with " + esc(firstName(p.name)))}</div>
+    </article>
+  </div>`;
+}
+
+function personEditorial(list) {
+  return `<div class="ed-list">${list.map(p => `
+    <article class="ed-item">
+      <div class="kicker">${[p.role, p.region].filter(Boolean).map(esc).join(" · ")}</div>
+      <h3>${esc(p.name)}</h3>
+      <div class="meta">${[p.org, p.city].filter(Boolean).map(esc).join(", ")}</div>
+      ${p.bio ? `<p>${esc(p.bio)}</p>` : ""}
+      ${p.topicsList.length ? `<p class="ed-line"><b>Covers</b> ${p.topicsList.map(esc).join(", ")}</p>` : ""}
+      ${p.openList.length ? `<p class="ed-line"><b>Open to</b> ${p.openList.map(esc).join(", ")}</p>` : ""}
+      <div class="ed-foot"><span class="links">${linksHtml(p)}</span>${connectBtn(p, "Connect →", "textlink")}</div>
+    </article>`).join("")}</div>`;
+}
+
+function renderPeople() {
+  const list = filteredPeople(), box = $("#peopleGrid");
+  $("#pCount").textContent = `Showing ${list.length} of ${state.people.length}`;
+  box.className = view === "cards" ? "grid" : "view-" + view;
+  if (!state.loaded) return;
+  if (!list.length) { box.innerHTML = `<div class="empty">No one matches those filters yet.</div>`; return; }
+  box.innerHTML = view === "directory" ? personDirectory(list)
+    : view === "profiles" ? personProfiles(list)
+    : view === "editorial" ? personEditorial(list)
+    : list.map(personCard).join("");
+}
+$("#peopleGrid").addEventListener("click", ev => {
+  const t = ev.target.closest("[data-topic]");
+  if (t) { $("#pTopic").value = t.dataset.topic; renderPeople(); return; }
+  const c = ev.target.closest("[data-connect]");
+  if (c) { ev.preventDefault(); openConnect(state.people[+c.dataset.connect]); return; }
+  const s = ev.target.closest("[data-sel]");
+  if (s) {
+    state.sel = +s.dataset.sel; renderPeople();
+    if (matchMedia("(max-width: 760px)").matches) $("#profileDetail").scrollIntoView({ behavior: "smooth" });
+  }
+});
+
+/* ---------- Events ---------- */
+const startOfToday = () => { const t = new Date(); t.setHours(0, 0, 0, 0); return t; };
+const eIdx = e => state.events.indexOf(e);
+const eWhere = e => [e.venue, e.city].filter(Boolean).join(", ");
+const eTime = e => [e.start, e.end].filter(Boolean).join(" – ");
+const fmtDate = (d, o) => d.toLocaleDateString("en-US", o);
+
+function filteredEvents(includePast) {
+  const today = startOfToday();
+  const q = $("#eSearch").value.trim().toLowerCase(), region = $("#eRegion").value, type = $("#eType").value,
+    format = $("#eFormat").value, showPast = includePast || $("#ePast").checked;
+  return state.events.filter(e => matches(e, q) && (!region || e.region === region) && (!type || e.orgType === type)
+    && (!format || e.format === format) && (showPast || !e.dateObj || e.dateObj >= today));
+}
+
+function eventCard(e) {
+  const d = e.dateObj, past = d && d < startOfToday(), where = eWhere(e);
+  return `
+    <article class="card event${past ? " past" : ""}" id="ev-${eIdx(e)}">
+      <div class="datebox">${d ? `<div class="m">${fmtDate(d, { month: "short" })}</div><div class="d">${d.getDate()}</div><div class="y">${d.getFullYear()}</div>` : `<div class="m">TBA</div>`}</div>
+      <div class="event-body">
+        ${e.orgType ? `<span class="role">${esc(e.orgType)}</span>` : ""}
+        <h3>${esc(e.title)}</h3>
+        <div class="meta">${esc(e.organizer)}</div>
+        <div class="meta">${[d && fmtDate(d, { weekday: "long" }), eTime(e), e.format].filter(Boolean).map(esc).join(" · ")}</div>
+        ${where ? `<div class="meta">📍 ${esc(where)}${e.region ? ` (${esc(e.region)})` : ""}</div>` : ""}
+        ${e.description ? `<p class="bio">${esc(e.description)}</p>` : ""}
+        ${e.topicsList.length ? `<div class="chips">${e.topicsList.map(t => `<span class="chip">${esc(t)}</span>`).join("")}</div>` : ""}
+        <div class="actions">${eventButtons(e)}</div>
+        ${eventFine(e)}
+      </div>
+    </article>`;
+}
+function eventButtons(e, linkCls = "btn", icsCls = "btn ghost") {
+  const past = e.dateObj && e.dateObj < startOfToday();
+  return (e.link ? `<a class="${linkCls}" href="${esc(url(e.link))}" target="_blank" rel="noopener">${past ? "Event page" : "Register"} ↗</a>` : "")
+    + (e.dateObj && !past ? `<button class="${icsCls}" data-ics="${eIdx(e)}">Add to calendar</button>` : "");
+}
+function eventFine(e) {
+  const bits = [e.cost && esc("Cost: " + e.cost), e.contactEmail && `Questions: <a href="mailto:${esc(e.contactEmail)}">${esc(e.contactEmail)}</a>`].filter(Boolean);
+  return bits.length ? `<div class="meta">${bits.join(" · ")}</div>` : "";
+}
+
+function eventAgenda(list) {
+  const groups = new Map();
+  for (const e of list) {
+    const k = e.dateObj ? fmtDate(e.dateObj, { month: "long", year: "numeric" }) : "Date to be announced";
+    if (!groups.has(k)) groups.set(k, []);
+    groups.get(k).push(e);
+  }
+  const today = startOfToday();
+  return `<div class="agenda">${[...groups].map(([month, evs]) => `
+    <h2 class="agenda-month">${esc(month)}</h2>
+    ${evs.map(e => `
+    <details class="agenda-row${e.dateObj && e.dateObj < today ? " past" : ""}">
+      <summary>
+        <span class="a-date">${e.dateObj ? `<b>${fmtDate(e.dateObj, { weekday: "short" })} ${e.dateObj.getDate()}</b>` : "<b>TBA</b>"}<span class="meta">${esc(e.start)}</span></span>
+        <span class="a-main"><b>${esc(e.title)}</b><span class="meta">${[e.organizer, e.format].filter(Boolean).map(esc).join(" · ")}</span></span>
+        <span class="a-where meta">${esc([e.city, e.region].filter(Boolean).join(", ") || e.venue)}</span>
+        <span class="a-act">${e.link ? `<a class="btn" href="${esc(url(e.link))}" target="_blank" rel="noopener">Register ↗</a>` : ""}</span>
+      </summary>
+      <div class="dir-more">
+        <div class="meta">${[eTime(e), eWhere(e)].filter(Boolean).map(esc).join(" · ")}</div>
+        ${e.description ? `<p class="bio">${esc(e.description)}</p>` : ""}
+        ${e.topicsList.length ? `<div class="chips">${e.topicsList.map(t => `<span class="chip">${esc(t)}</span>`).join("")}</div>` : ""}
+        <div class="actions">${eventButtons(e, "btn ghost")}</div>
+        ${eventFine(e)}
+      </div>
+    </details>`).join("")}`).join("")}</div>`;
+}
+
+function eventCalendar(list) {
+  const today = startOfToday();
+  if (!state.calMonth) {
+    const next = list.find(e => e.dateObj && e.dateObj >= today);
+    const base = next ? next.dateObj : today;
+    state.calMonth = new Date(base.getFullYear(), base.getMonth(), 1);
+  }
+  const m = state.calMonth, y = m.getFullYear(), mo = m.getMonth();
+  const inMonth = list.filter(e => e.dateObj && e.dateObj.getFullYear() === y && e.dateObj.getMonth() === mo);
+  const start = new Date(y, mo, 1 - m.getDay());
+  const cells = [];
+  for (let i = 0; i < 42; i++) {
+    const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+    if (i >= 35 && d.getMonth() !== mo) break;
+    const evs = inMonth.filter(e => e.dateObj.getTime() === d.getTime());
+    cells.push(`<div class="cal-cell${d.getMonth() !== mo ? " out" : ""}${d.getTime() === today.getTime() ? " today" : ""}">
+      <span class="cal-num">${d.getDate()}</span>
+      ${evs.map(e => `<button class="cal-ev" data-ev="${eIdx(e)}" title="${esc(e.title)}">${esc(e.title)}</button>`).join("")}
+    </div>`);
+  }
+  return `<div class="cal">
+    <div class="cal-nav">
+      <button class="btn ghost" data-calnav="-1" aria-label="Previous month">‹</button>
+      <h2>${fmtDate(m, { month: "long", year: "numeric" })}</h2>
+      <button class="btn ghost" data-calnav="1" aria-label="Next month">›</button>
+    </div>
+    <div class="cal-grid">
+      ${["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(d => `<div class="cal-dow">${d}</div>`).join("")}
+      ${cells.join("")}
+    </div>
+    <h3 class="cal-sub">${inMonth.length ? `${inMonth.length} event${inMonth.length > 1 ? "s" : ""} this month` : "No events this month"}</h3>
+    <div class="grid events-grid">${inMonth.map(eventCard).join("")}</div>
+  </div>`;
+}
+
+function eventEditorial(list) {
+  const today = startOfToday();
+  return `<div class="ed-events">${list.map(e => {
+    const d = e.dateObj;
+    return `
+    <article class="ed-event${d && d < today ? " past" : ""}">
+      <div class="ed-date">${d ? `<span class="ed-day">${d.getDate()}</span><span>${fmtDate(d, { month: "short" })} · ${fmtDate(d, { weekday: "short" })}</span>` : `<span class="ed-day">—</span><span>TBA</span>`}</div>
+      <div>
+        <div class="kicker">${[e.orgType, e.region].filter(Boolean).map(esc).join(" · ")}</div>
+        <h3>${esc(e.title)}</h3>
+        <div class="meta">${[e.organizer, eTime(e), e.format].filter(Boolean).map(esc).join(" · ")}</div>
+        ${eWhere(e) ? `<div class="meta">${esc(eWhere(e))}</div>` : ""}
+        ${e.description ? `<p>${esc(e.description)}</p>` : ""}
+        <div class="ed-foot">${eventButtons(e, "textlink", "textlink")}</div>
+      </div>
+    </article>`;
+  }).join("")}</div>`;
+}
+
+function renderEvents() {
+  const today = startOfToday(), box = $("#eventsGrid");
+  const list = filteredEvents(view === "profiles");
+  const upcoming = state.events.filter(e => !e.dateObj || e.dateObj >= today).length;
+  $("#eCount").textContent = view === "profiles" ? `${upcoming} upcoming` : `Showing ${list.length} · ${upcoming} upcoming`;
+  $("#ePast").closest("label").hidden = view === "profiles";
+  box.className = view === "cards" ? "grid events-grid" : "view-" + view;
+  if (!state.loaded) return;
+  if (!list.length && view !== "profiles") { box.innerHTML = `<div class="empty">No events match. Try turning on "Show past events" or clearing filters.</div>`; return; }
+  box.innerHTML = view === "directory" ? eventAgenda(list)
+    : view === "profiles" ? eventCalendar(list)
+    : view === "editorial" ? eventEditorial(list)
+    : list.map(eventCard).join("");
+}
+
+$("#eventsGrid").addEventListener("click", ev => {
+  const b = ev.target.closest("[data-ics]");
+  if (b) { ev.preventDefault(); downloadIcs(state.events[+b.dataset.ics]); return; }
+  const n = ev.target.closest("[data-calnav]");
+  if (n) { const m = state.calMonth; state.calMonth = new Date(m.getFullYear(), m.getMonth() + +n.dataset.calnav, 1); renderEvents(); return; }
+  const c = ev.target.closest("[data-ev]");
+  if (c) {
+    const card = $("#ev-" + c.dataset.ev);
+    card.scrollIntoView({ behavior: "smooth", block: "center" });
+    card.classList.add("flash"); setTimeout(() => card.classList.remove("flash"), 1200);
+  }
+});
+
+function parseTime(t, base) {
+  const m = String(t || "").match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm)?/i);
+  if (!m) return null;
+  let h = +m[1]; const min = +(m[2] || 0), ap = (m[3] || "").toLowerCase();
+  if (ap === "pm" && h < 12) h += 12; if (ap === "am" && h === 12) h = 0;
+  const d = new Date(base); d.setHours(h, min, 0, 0); return d;
+}
+function downloadIcs(e) {
+  const pad = n => String(n).padStart(2, "0");
+  const fmt = d => `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
+  const day = d => `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}`;
+  const s = parseTime(e.start, e.dateObj), en = parseTime(e.end, e.dateObj);
+  const icsEsc = v => String(v || "").replace(/([,;\\])/g, "\\$1").replace(/\n/g, "\\n");
+  const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//TXEnvCollab//EN", "BEGIN:VEVENT",
+    "UID:" + Date.now() + "@txenvcollab", "DTSTAMP:" + fmt(new Date()),
+    s ? "DTSTART:" + fmt(s) : "DTSTART;VALUE=DATE:" + day(e.dateObj),
+    s ? "DTEND:" + fmt(en || new Date(s.getTime() + 3600e3)) : "",
+    "SUMMARY:" + icsEsc(e.title), "DESCRIPTION:" + icsEsc([e.description, e.link].filter(Boolean).join("\n")),
+    "LOCATION:" + icsEsc([e.venue, e.city].filter(Boolean).join(", ")), "END:VEVENT", "END:VCALENDAR"].filter(Boolean);
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([lines.join("\r\n")], { type: "text/calendar" }));
+  a.download = String(e.title).replace(/[^\w]+/g, "-").slice(0, 50) + ".ics";
+  a.click();
+}
+
+/* ---------- Connect dialog ---------- */
+let target = null;
+const dlg = $("#connectDlg"), form = $("#connectForm");
+function openConnect(p) {
+  target = p;
+  $("#dlgTitle").textContent = "Connect with " + p.name;
+  $("#dlgSub").textContent = [p.role, p.org].filter(Boolean).join(" · ") + (p.openList.length ? " — open to " + p.openList.join(", ").toLowerCase() : "");
+  try { const saved = JSON.parse(localStorage.getItem("txenv-sender") || "{}"); form.fromName.value ||= saved.n || ""; form.fromEmail.value ||= saved.e || ""; form.fromOrg.value ||= saved.o || ""; } catch {}
+  form.message.value = "";
+  dlg.showModal();
+}
+$("#dlgCancel").onclick = () => dlg.close();
+$("#dlgCopy").onclick = async () => {
+  try { await navigator.clipboard.writeText(target.email); toast("Copied " + target.email); }
+  catch { toast(target.email); }
+};
+form.addEventListener("submit", ev => {
+  ev.preventDefault();
+  if (!form.reportValidity()) return;
+  const f = Object.fromEntries(new FormData(form));
+  try { localStorage.setItem("txenv-sender", JSON.stringify({ n: f.fromName, e: f.fromEmail, o: f.fromOrg })); } catch {}
+  const first = String(target.name).replace(/\(.*?\)/g, "").trim().split(/\s+/).filter(w => !/^dr\.?$/i.test(w))[0] || "";
+  const subject = `${CONFIG.emailSubjectPrefix} ${f.kind} from ${f.fromName}`;
+  const body = `Hi ${first},\n\n${f.message}\n\n— ${f.fromName}${f.fromOrg ? ", " + f.fromOrg : ""}\n${f.fromEmail}\n\n` +
+    `(Sent via ${CONFIG.siteName}, a directory of people covering Texas's environment.)`;
+  location.href = `mailto:${encodeURIComponent(target.email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  dlg.close();
+  toast("Opening your email app…");
+});
+
+function toast(msg) { const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 2200); }
+
+/* ---------- Font preview (prototype) ---------- */
+const FONTS = ["Montserrat", "Outfit", "Poppins", "Urbanist", "Raleway", "Plus Jakarta Sans"];
+const fontPrefs = (() => { try { return JSON.parse(localStorage.getItem("txenv-font") || "{}"); } catch { return {}; } })();
+$("#fontPick").innerHTML = FONTS.map(f => `<option style="font-family:'${f}'">${f}</option>`).join("");
+$("#fontPick").value = FONTS.includes(fontPrefs.f) ? fontPrefs.f : "Montserrat";
+$("#fontAll").checked = !!fontPrefs.all;
+function applyFont() {
+  const f = `'${$("#fontPick").value}', system-ui, sans-serif`;
+  document.documentElement.style.setProperty("--head-font", f);
+  document.documentElement.style.setProperty("--body-font", $("#fontAll").checked ? f : "Inter, system-ui, sans-serif");
+  try { localStorage.setItem("txenv-font", JSON.stringify({ f: $("#fontPick").value, all: $("#fontAll").checked })); } catch {}
+}
+$("#fontPick").onchange = applyFont; $("#fontAll").onchange = applyFont;
+applyFont();
+
+setView(view);
+loadFromUrl();
+if (CONFIG.autoRefreshMinutes) setInterval(loadFromUrl, CONFIG.autoRefreshMinutes * 60e3);
+document.addEventListener("visibilitychange", () => { if (!document.hidden) loadFromUrl(); });
+</script>
+</body>
+</html>
