@@ -134,6 +134,8 @@
   .dlg-body label { display: grid; gap: 4px; font-size: 13px; font-weight: 600; }
   .dlg-body input, .dlg-body select, .dlg-body textarea { font: 400 14px var(--body-font); padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--ink); width: 100%; }
   .dlg-body textarea { min-height: 70px; resize: vertical; }
+  .dlg-body .row2 label { align-content: end; }
+  .dlg-body input, .dlg-body select { height: 42px; }
   .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   @media (max-width: 520px) { .row2 { grid-template-columns: 1fr; } .event { flex-direction: column; } }
   .dlg-foot { padding: 14px 22px 20px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
@@ -376,12 +378,12 @@
       <div class="dlg-col">
         <div class="dlg-step">1 · About you</div>
         <div class="row2">
-          <label>Your name <input name="fromName" required autocomplete="name"></label>
-          <label>Organization / role <span class="hint">(optional)</span><input name="fromOrg" autocomplete="organization"></label>
+          <label><span>Your name</span><input name="fromName" required autocomplete="name"></label>
+          <label><span>Organization / role <span class="hint">(optional)</span></span><input name="fromOrg" autocomplete="organization"></label>
         </div>
         <div class="dlg-step">2 · The idea</div>
         <div class="row2">
-          <label>What are you proposing?
+          <label><span>What are you proposing?</span>
             <select name="kind">
               <option>Story pitch</option>
               <option>Co-reporting / collaboration</option>
@@ -391,7 +393,7 @@
               <option>Something else</option>
             </select>
           </label>
-          <label>Working title <span class="hint">(becomes the subject line)</span><input name="title" required></label>
+          <label><span>Working title <span class="hint">(becomes the subject line)</span></span><input name="title" required></label>
         </div>
         <label>The idea in 2–3 sentences <textarea name="idea" required placeholder="What's the story or project?"></textarea></label>
         <label>Why them? <span class="hint">(what about their work made you reach out)</span><textarea name="why" placeholder="e.g. Your aquifer coverage, your Spanish-language audience…"></textarea></label>
