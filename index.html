@@ -71,6 +71,8 @@
   .title-line { display: flex; align-items: baseline; gap: 8px; font-size: 14px; font-weight: 500; color: var(--ink); }
   .title-line::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex: none; transform: translateY(-1px); }
   .clamp { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .clamp.open { display: block; -webkit-line-clamp: unset; }
+  .more { font: 600 13px var(--body-font); color: var(--ink); background: none; border: 0; padding: 0; margin-top: -4px; cursor: pointer; text-decoration: underline; justify-self: start; align-self: flex-start; }
   .oneline { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .pt-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
   .chip.more { background: none; color: var(--muted); cursor: default; padding-left: 2px; }
@@ -461,6 +463,7 @@ $("#joinLink").href = "mailto:" + CONFIG.teamEmail;
 function showTab(name) {
   document.querySelectorAll("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === name));
   ["people", "events", "about"].forEach(t => $("#tab-" + t).hidden = t !== name);
+  markClamps(document);
   history.replaceState(null, "", "#" + name);
 }
 document.querySelectorAll("nav.tabs button").forEach(b => b.onclick = () => showTab(b.dataset.tab));
@@ -633,7 +636,7 @@ function personCard(p) {
         </div>
       </div>
       <span class="title-line">${esc(titleLine(p))}</span>
-      ${p.bio ? `<p class="bio clamp">${esc(p.bio)}</p>` : ""}
+      ${p.bio ? `<p class="bio clamp">${esc(p.bio)}</p><button type="button" class="more" data-more>Read more</button>` : ""}
       ${p.topicsList.length ? `<div class="chips">${p.topicsList.slice(0, 3).map(t => `<button class="chip" data-topic="${esc(t)}">${esc(t)}</button>`).join("")}${p.topicsList.length > 3 ? `<span class="chip more">+${p.topicsList.length - 3}</span>` : ""}</div>` : ""}
       <div class="card-foot">
         <span class="links">${[p.portfolio && `<a href="${esc(url(p.portfolio))}" target="_blank" rel="noopener">Portfolio ↗</a>`, p.social && `<a href="${esc(url(p.social))}" target="_blank" rel="noopener">Social ↗</a>`].filter(Boolean).join("")}</span>
@@ -717,7 +720,19 @@ function renderPeople() {
     : view === "profiles" ? personProfiles(list)
     : view === "editorial" ? personEditorial(list)
     : list.map(personCard).join("");
+  markClamps(box);
 }
+// Show "Read more" only under text that's actually cut off
+function markClamps(box) {
+  box.querySelectorAll(".clamp:not(.open) + .more").forEach(b => { const p = b.previousElementSibling; if (p.offsetParent) b.hidden = p.scrollHeight <= p.clientHeight + 1; });
+}
+addEventListener("resize", () => markClamps(document));
+document.addEventListener("click", ev => {
+  const b = ev.target.closest("[data-more]");
+  if (!b) return;
+  const open = b.previousElementSibling.classList.toggle("open");
+  b.textContent = open ? "Show less" : "Read more";
+});
 $("#peopleGrid").addEventListener("click", ev => {
   const t = ev.target.closest("[data-topic]");
   if (t) { $("#pTopic").value = t.dataset.topic; renderPeople(); return; }
@@ -756,7 +771,7 @@ function eventCard(e) {
         <div class="meta">${esc(e.organizer)}</div>
         <div class="meta">${[d && fmtDate(d, { weekday: "long" }), eTime(e), e.format].filter(Boolean).map(esc).join(" · ")}</div>
         ${where ? `<div class="meta oneline">📍 ${esc(where)}</div>` : ""}
-        ${e.description ? `<p class="bio clamp">${esc(e.description)}</p>` : ""}
+        ${e.description ? `<p class="bio clamp">${esc(e.description)}</p><button type="button" class="more" data-more>Read more</button>` : ""}
         ${e.topicsList.length ? `<div class="chips">${e.topicsList.map(t => `<span class="chip">${esc(t)}</span>`).join("")}</div>` : ""}
         <div class="actions">${eventButtons(e)}</div>
         ${eventFine(e)}
@@ -868,6 +883,7 @@ function renderEvents() {
     : view === "profiles" ? eventCalendar(list)
     : view === "editorial" ? eventEditorial(list)
     : list.map(eventCard).join("");
+  markClamps(box);
 }
 
 $("#eventsGrid").addEventListener("click", ev => {
