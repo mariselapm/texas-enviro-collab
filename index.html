@@ -111,16 +111,29 @@
   footer button { font: inherit; background: none; border: 0; color: var(--brand); cursor: pointer; padding: 0; text-decoration: underline; }
 
   /* Connect dialog */
-  dialog { border: 0; border-radius: 16px; padding: 0; width: min(560px, calc(100vw - 32px)); background: var(--surface); color: var(--ink); box-shadow: 0 20px 60px rgba(0,0,0,.3); }
+  dialog { border: 0; border-radius: 16px; padding: 0; width: min(1000px, calc(100vw - 32px)); background: var(--surface); color: var(--ink); box-shadow: 0 20px 60px rgba(0,0,0,.3); }
   dialog::backdrop { background: rgba(20,26,22,.5); }
   .dlg-head { padding: 20px 22px 0; }
   .dlg-head h2 { margin: 0; font-family: var(--head-font); font-size: 22px; }
   #dlgSub { margin-top: 6px; line-height: 1.6; }
   #dlgSub b { color: var(--ink); font-weight: 600; }
-  .dlg-body { padding: 14px 22px 4px; display: grid; gap: 12px; }
+  .dlg-body { padding: 0; display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--line); margin-top: 14px; }
+  .dlg-col { padding: 16px 22px; display: grid; gap: 12px; align-content: start; }
+  .dlg-col + .dlg-col { border-left: 1px solid var(--line); background: var(--bg); }
+  .dlg-step { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 700; margin-top: 4px; }
+  .mail { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 6px 14px 12px; font-size: 14px; }
+  .mail-f { display: flex; gap: 10px; align-items: baseline; padding: 7px 0; border-bottom: 1px solid var(--line); }
+  .mail-f b { width: 62px; flex: none; color: var(--muted); font-weight: 600; font-size: 13px; }
+  .mail-f span { flex: 1; word-break: break-word; }
+  .mail pre { white-space: pre-wrap; font: 400 14px/1.55 var(--body-font); margin: 10px 0 0; max-height: 300px; overflow: auto; }
+  #mEdit { width: 100%; min-height: 240px; margin-top: 10px; font: 400 14px/1.55 var(--body-font); padding: 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); resize: vertical; }
+  .copy { font: 600 12px var(--body-font); border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 7px; padding: 3px 9px; cursor: pointer; flex: none; }
+  .send-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .check { background: var(--chip); color: var(--chip-ink); border-left: 4px solid var(--brand); padding: 10px 12px; border-radius: 8px; font-size: 13px; }
+  @media (max-width: 760px) { .dlg-body { grid-template-columns: 1fr; } .dlg-col + .dlg-col { border-left: 0; border-top: 1px solid var(--line); } }
   .dlg-body label { display: grid; gap: 4px; font-size: 13px; font-weight: 600; }
   .dlg-body input, .dlg-body select, .dlg-body textarea { font: 400 14px var(--body-font); padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--ink); width: 100%; }
-  .dlg-body textarea { min-height: 130px; resize: vertical; }
+  .dlg-body textarea { min-height: 70px; resize: vertical; }
   .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   @media (max-width: 520px) { .row2 { grid-template-columns: 1fr; } .event { flex-direction: column; } }
   .dlg-foot { padding: 14px 22px 20px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
@@ -336,7 +349,7 @@
         <p>A prototype built by journalism students to connect the people covering Texas's environment: news organizations, creators, educators and reporters. We'd love your feedback.</p>
       </div>
       <h2>How connecting works</h2>
-      <p>Click <b>Connect</b> on anyone's card, fill in a short pitch, and your own email app opens with a ready-to-send message addressed to them. Nothing is stored on this site.</p>
+      <p>Click <b>Connect</b> on anyone's card and answer a few short questions about you and your idea. The site writes the email for you: open it in Gmail or Outlook, or copy it into any email app, then review and send it from your own account. Nothing is stored on this site.</p>
       <h2>Want to be listed?</h2>
       <p>Everyone in the directory has agreed to be included. To join, or to add an event, email us at <a id="joinLink" href="#"></a>.</p>
       <h2>How the data is kept up to date</h2>
@@ -360,32 +373,54 @@
       <div class="meta" id="dlgSub"></div>
     </div>
     <div class="dlg-body">
-      <div class="row2">
-        <label>Your name <input name="fromName" required autocomplete="name"></label>
-        <label>Your email <input name="fromEmail" type="email" required autocomplete="email"></label>
+      <div class="dlg-col">
+        <div class="dlg-step">1 · About you</div>
+        <div class="row2">
+          <label>Your name <input name="fromName" required autocomplete="name"></label>
+          <label>Organization / role <span class="hint">(optional)</span><input name="fromOrg" autocomplete="organization"></label>
+        </div>
+        <div class="dlg-step">2 · The idea</div>
+        <div class="row2">
+          <label>What are you proposing?
+            <select name="kind">
+              <option>Story pitch</option>
+              <option>Co-reporting / collaboration</option>
+              <option>Interview or expert source</option>
+              <option>Event or workshop</option>
+              <option>Sharing data or resources</option>
+              <option>Something else</option>
+            </select>
+          </label>
+          <label>Working title <span class="hint">(becomes the subject line)</span><input name="title" required></label>
+        </div>
+        <label>The idea in 2–3 sentences <textarea name="idea" required placeholder="What's the story or project?"></textarea></label>
+        <label>Why them? <span class="hint">(what about their work made you reach out)</span><textarea name="why" placeholder="e.g. Your aquifer coverage, your Spanish-language audience…"></textarea></label>
+        <div class="dlg-step">3 · The ask</div>
+        <label>What you're hoping for <span class="hint">(timeline, format, next step)</span><textarea name="ask" placeholder="e.g. A 20-minute call next week? Aiming to publish in December."></textarea></label>
       </div>
-      <div class="row2">
-        <label>Your organization <span class="hint">(optional)</span><input name="fromOrg" autocomplete="organization"></label>
-        <label>What are you proposing?
-          <select name="kind">
-            <option>Story pitch</option>
-            <option>Co-reporting / collaboration</option>
-            <option>Interview or expert source</option>
-            <option>Event or workshop</option>
-            <option>Sharing data or resources</option>
-            <option>Something else</option>
-          </select>
-        </label>
+      <div class="dlg-col">
+        <div class="dlg-step">Your email, ready to send</div>
+        <div class="mail">
+          <div class="mail-f"><b>To</b><span id="mTo"></span><button type="button" class="copy" data-copy="to">Copy</button></div>
+          <div class="mail-f"><b>Subject</b><span id="mSub"></span><button type="button" class="copy" data-copy="sub">Copy</button></div>
+          <div class="mail-f" style="border:0"><b>Message</b><span></span><button type="button" class="copy" id="mEditBtn">Edit</button><button type="button" class="copy" data-copy="body">Copy</button></div>
+          <pre id="mBody"></pre>
+          <textarea id="mEdit" hidden></textarea>
+          <div class="hint" id="mEdited" hidden>Edited by you. <a href="#" id="mReset">Undo my edits</a></div>
+        </div>
+        <div class="dlg-step">Send it from your own email</div>
+        <label>Which address will you send from? <span class="hint">(Gmail will open in this account)</span><input name="fromEmail" type="email" autocomplete="email" placeholder="you@gmail.com"></label>
+        <div class="send-row">
+          <a class="btn" id="sendGmail" target="_blank" rel="noopener">Open in Gmail</a>
+          <a class="btn ghost" id="sendOutlook" target="_blank" rel="noopener">Open in Outlook</a>
+          <button type="button" class="btn ghost" data-copy="all">Copy everything</button>
+        </div>
+        <div class="check" id="sendCheck" hidden></div>
+        <div class="hint">It sends from your own account, so they see your real address and can simply hit Reply. Nothing is stored on this site. Using another email service? Copy everything, or <a href="#" id="sendMailto">use your computer's mail app</a>.</div>
       </div>
-      <label>Your pitch
-        <textarea name="message" required placeholder="What's the story or project, why them, and what you're hoping for (timeline, format, etc.)"></textarea>
-      </label>
-      <div class="hint">"Open email" starts a draft in your own email app. You can review it before sending.</div>
     </div>
     <div class="dlg-foot">
-      <button type="button" class="btn ghost" id="dlgCancel">Cancel</button>
-      <button type="button" class="btn ghost" id="dlgCopy">Copy email address</button>
-      <button type="submit" class="btn" id="dlgSend">Open email ✉</button>
+      <button type="button" class="btn ghost" id="dlgCancel">Close</button>
     </div>
   </form>
 </dialog>
@@ -405,7 +440,7 @@ const CONFIG = {
   contactsSheet: "Contacts",
   eventsSheet: "Events",
   teamEmail: "team@example.com",       // shown on the About page for people who want to join
-  emailSubjectPrefix: "[Texas Environment Collab]",
+  emailSubjectPrefix: "Texas Environment Collab |",
   autoRefreshMinutes: 5                 // re-read the spreadsheet in the background
 };
 /* ====================================================== */
@@ -882,26 +917,61 @@ function openConnect(p) {
     + (p.languages ? `<br><b>Languages:</b> ${esc(p.languages)}` : "")
     + (p.email ? `<br><b>Email:</b> ${esc(p.email)}` : "");
   try { const saved = JSON.parse(localStorage.getItem("txenv-sender") || "{}"); form.fromName.value ||= saved.n || ""; form.fromEmail.value ||= saved.e || ""; form.fromOrg.value ||= saved.o || ""; } catch {}
-  form.message.value = "";
+  ["title", "idea", "why", "ask"].forEach(k => form[k].value = "");
+  msgEdited = false; setEditing(false);
+  $("#sendCheck").hidden = true;
+  buildEmail();
   dlg.showModal();
 }
-$("#dlgCancel").onclick = () => dlg.close();
-$("#dlgCopy").onclick = async () => {
-  try { await navigator.clipboard.writeText(target.email); toast("Copied " + target.email); }
-  catch { toast(target.email); }
-};
-form.addEventListener("submit", ev => {
-  ev.preventDefault();
-  if (!form.reportValidity()) return;
+function buildEmail() {
   const f = Object.fromEntries(new FormData(form));
-  try { localStorage.setItem("txenv-sender", JSON.stringify({ n: f.fromName, e: f.fromEmail, o: f.fromOrg })); } catch {}
-  const first = String(target.name).replace(/\(.*?\)/g, "").trim().split(/\s+/).filter(w => !/^dr\.?$/i.test(w))[0] || "";
-  const subject = `${CONFIG.emailSubjectPrefix} ${f.kind} from ${f.fromName}`;
-  const body = `Hi ${first},\n\n${f.message}\n\n— ${f.fromName}${f.fromOrg ? ", " + f.fromOrg : ""}\n${f.fromEmail}\n\n` +
-    `(Sent via ${CONFIG.siteName}, a directory of people covering Texas's environment.)`;
-  location.href = `mailto:${encodeURIComponent(target.email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  dlg.close();
-  toast("Opening your email app…");
+  const name = f.fromName.trim() || "(your name)", org = f.fromOrg.trim();
+  const first = firstName(target.name);
+  const subject = `${CONFIG.emailSubjectPrefix} ${f.kind}: ${f.title.trim() || "(working title)"}`;
+  const body = [
+    `Hi ${first},`,
+    `I'm ${name}${org ? ", " + org : ""}. I found you through ${CONFIG.siteName} and I'd like to propose ${/^[aeiou]/i.test(f.kind) ? "an" : "a"} ${f.kind.toLowerCase()}.`,
+    f.idea.trim(),
+    f.why.trim() && "Why I'm reaching out to you: " + f.why.trim(),
+    f.ask.trim(),
+    `Thanks,\n${name}${org ? "\n" + org : ""}`
+  ].filter(Boolean).join("\n\n");
+  if (!msgEdited) $("#mEdit").value = body;
+  const finalBody = $("#mEdit").value;
+  $("#mBody").textContent = finalBody; $("#mEdited").hidden = !msgEdited;
+  const e = encodeURIComponent, from = f.fromEmail.trim();
+  $("#mTo").textContent = target.email; $("#mSub").textContent = subject;
+  $("#sendGmail").href = `https://mail.google.com/mail/?${from ? "authuser=" + e(from) + "&" : ""}view=cm&fs=1&to=${e(target.email)}&su=${e(subject)}&body=${e(finalBody)}`;
+  $("#sendOutlook").href = `https://outlook.office.com/mail/deeplink/compose?to=${e(target.email)}&subject=${e(subject)}&body=${e(finalBody)}`;
+  $("#sendMailto").href = `mailto:${e(target.email)}?subject=${e(subject)}&body=${e(finalBody)}`;
+  return { to: target.email, subject, body: finalBody, from, f };
+}
+let msgEdited = false;
+function setEditing(on) {
+  $("#mEdit").hidden = !on; $("#mBody").hidden = on;
+  $("#mEditBtn").textContent = on ? "Done" : "Edit";
+}
+$("#mEditBtn").onclick = () => { setEditing($("#mEdit").hidden); buildEmail(); };
+$("#mEdit").addEventListener("input", () => { msgEdited = true; });
+$("#mReset").onclick = ev => { ev.preventDefault(); msgEdited = false; setEditing(false); buildEmail(); };
+form.addEventListener("input", buildEmail);
+$("#dlgCancel").onclick = () => dlg.close();
+form.addEventListener("submit", ev => ev.preventDefault());
+form.addEventListener("click", async ev => {
+  const c = ev.target.closest("[data-copy]");
+  if (c) {
+    const m = buildEmail(), k = c.dataset.copy;
+    const txt = k === "to" ? m.to : k === "sub" ? m.subject : k === "body" ? m.body : `To: ${m.to}\nSubject: ${m.subject}\n\n${m.body}`;
+    try { await navigator.clipboard.writeText(txt); toast("Copied"); } catch { toast("Couldn't copy, select the text instead"); }
+    return;
+  }
+  const s = ev.target.closest("#sendGmail, #sendOutlook, #sendMailto");
+  if (!s) return;
+  if (!form.reportValidity()) { ev.preventDefault(); return; }
+  const m = buildEmail();
+  try { localStorage.setItem("txenv-sender", JSON.stringify({ n: m.f.fromName, e: m.from, o: m.f.fromOrg })); } catch {}
+  $("#sendCheck").innerHTML = `✓ Draft opened. <b>Before you hit Send, check the "From" line</b>${m.from ? ` (it should say ${esc(m.from)})` : ""}. That's the address ${esc(firstName(target.name))} will see and reply to.`;
+  $("#sendCheck").hidden = false;
 });
 
 function toast(msg) { const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 2200); }

@@ -1,3 +1,4 @@
 .DS_Store
 # Old local starter spreadsheet; the site now reads the published Google Sheet
 data/
+.superpowers/
