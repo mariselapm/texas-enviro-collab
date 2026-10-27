@@ -115,7 +115,10 @@
   /* Connect dialog */
   dialog { border: 0; border-radius: 16px; padding: 0; width: min(1000px, calc(100vw - 32px)); background: var(--surface); color: var(--ink); box-shadow: 0 20px 60px rgba(0,0,0,.3); }
   dialog::backdrop { background: rgba(20,26,22,.5); }
-  .dlg-head { padding: 20px 22px 0; }
+  .dlg-head { padding: 20px 22px 0; position: relative; }
+  .dlg-head h2 { padding-right: 44px; }
+  .dlg-x { position: absolute; top: 14px; right: 14px; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: 400 24px/1 var(--body-font); cursor: pointer; }
+  .dlg-x:hover { background: var(--chip); }
   .dlg-head h2 { margin: 0; font-family: var(--head-font); font-size: 22px; }
   #dlgSub { margin-top: 6px; line-height: 1.6; }
   #dlgSub b { color: var(--ink); font-weight: 600; }
@@ -373,6 +376,7 @@
 <dialog id="connectDlg">
   <form method="dialog" id="connectForm">
     <div class="dlg-head">
+      <button type="button" class="dlg-x" id="dlgX" aria-label="Close">×</button>
       <h2 id="dlgTitle">Connect</h2>
       <div class="meta" id="dlgSub"></div>
     </div>
@@ -380,7 +384,7 @@
       <div class="dlg-col">
         <div class="dlg-step">1 · About you</div>
         <div class="row2">
-          <label><span>Your name</span><input name="fromName" required autocomplete="name"></label>
+          <label><span>Your name</span><input name="fromName" autofocus required autocomplete="name"></label>
           <label><span>Organization / role <span class="hint">(optional)</span></span><input name="fromOrg" autocomplete="organization"></label>
         </div>
         <div class="dlg-step">2 · The idea</div>
@@ -973,7 +977,9 @@ $("#mEditBtn").onclick = () => { setEditing($("#mEdit").hidden); buildEmail(); }
 $("#mEdit").addEventListener("input", () => { msgEdited = true; });
 $("#mReset").onclick = ev => { ev.preventDefault(); msgEdited = false; setEditing(false); buildEmail(); };
 form.addEventListener("input", buildEmail);
-$("#dlgCancel").onclick = () => dlg.close();
+$("#dlgCancel").onclick = $("#dlgX").onclick = () => dlg.close();
+// Clicking the dimmed area outside the box also closes it
+dlg.addEventListener("click", ev => { if (ev.target === dlg) dlg.close(); });
 form.addEventListener("submit", ev => ev.preventDefault());
 form.addEventListener("click", async ev => {
   const c = ev.target.closest("[data-copy]");
