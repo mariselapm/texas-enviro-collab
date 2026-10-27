@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Texas Environment Collab</title>
+<title>The Bluebonnet Bulletin</title>
 <!-- Tab icon: the Buginese letter ᨒ, drawn with Noto Sans Buginese so it shows on every computer -->
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon.png">
@@ -320,7 +320,7 @@
   <!-- PEOPLE -->
   <section id="tab-people">
     <div class="hero">
-      <h1>Find someone to cover Texas's environment with.</h1>
+      <h1>Find someone to cover Texas' environment with.</h1>
       <p>Reporters, newsrooms, creators and educators across Texas who've said they're open to collaborating. Filter by region or topic, then reach out with a pitch.</p>
     </div>
     <div class="toolbar">
@@ -355,7 +355,7 @@
     <div class="about">
       <div class="hero" style="padding-left:0">
         <h1>About this project</h1>
-        <p>A prototype built by journalism students to connect the people covering Texas's environment: news organizations, creators, educators and reporters. We'd love your feedback.</p>
+        <p>A prototype built by journalism students to connect the people covering Texas' environment: news organizations, creators, educators and reporters. We'd love your feedback.</p>
       </div>
       <h2>How connecting works</h2>
       <p>Click <b>Connect</b> on anyone's card and answer a few short questions about you and your idea. The site writes the email for you: open it in Gmail or Outlook, or copy it into any email app, then review and send it from your own account. Nothing is stored on this site.</p>
@@ -440,8 +440,8 @@
 <script>
 /* ======================= CONFIG ======================= */
 const CONFIG = {
-  siteName: "Texas Environment Collab",
-  tagline: "Connecting the people who cover Texas's environment",
+  siteName: "The Bluebonnet Bulletin",
+  tagline: "Connecting the people who cover Texas' environment",
   // Where the spreadsheet lives. Default: the file in the data/ folder next to this page.
   // To use a shared online sheet instead, paste a published-to-web link here, e.g. Google Sheets:
   // File → Share → Publish to web → Entire document → Microsoft Excel (.xlsx) → copy link.
@@ -450,7 +450,7 @@ const CONFIG = {
   contactsSheet: "Contacts",
   eventsSheet: "Events",
   teamEmail: "team@example.com",       // shown on the About page for people who want to join
-  emailSubjectPrefix: "Texas Environment Collab |",
+  emailSubjectPrefix: "The Bluebonnet Bulletin |",
   autoRefreshMinutes: 5                 // re-read the spreadsheet in the background
 };
 /* ====================================================== */
@@ -1008,11 +1008,11 @@ function toast(msg) { const t = $("#toast"); t.textContent = msg; t.classList.ad
 const PALETTES = { hillcountry: "Hill Country (sage)", gulf: "Gulf Coast (seafoam)", bluebonnet: "Bluebonnet (butter yellow)", bigbend: "Big Bend (soft gray)", bw: "Black & white" };
 $("#palettePick").innerHTML = Object.entries(PALETTES).map(([k, v]) => `<option value="${k}">${v}</option>`).join("");
 let palette = new URLSearchParams(location.search).get("palette");
-if (!PALETTES[palette]) { try { palette = localStorage.getItem("txenv-palette"); } catch {} }
-if (!PALETTES[palette]) palette = "hillcountry";
+if (!PALETTES[palette]) { try { palette = localStorage.getItem("txenv-palette-v2"); } catch {} }
+if (!PALETTES[palette]) palette = "bluebonnet";
 function applyPalette(p) {
   document.body.dataset.palette = p; $("#palettePick").value = p;
-  try { localStorage.setItem("txenv-palette", p); } catch {}
+  try { localStorage.setItem("txenv-palette-v2", p); } catch {}
 }
 $("#palettePick").onchange = () => applyPalette($("#palettePick").value);
 applyPalette(palette);
