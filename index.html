@@ -163,10 +163,10 @@
     --brand: #10343a; --brand-ink: #ffffff; --accent: #f2b544; --accent-ink: #10343a;
     --chip: #d6ecea; --chip-ink: #10343a; --head-bg: #c6e8e4; --head-ink: #10343a;
   }
-  body[data-palette="bluebonnet"] {    /* butter yellow + indigo + bluebonnet blue */
-    --bg: #faf8f1; --ink: #1d2550; --muted: #5a5f7a; --line: #e8e4d6;
-    --brand: #1d2550; --brand-ink: #ffffff; --accent: #3f5bd0; --accent-ink: #ffffff;
-    --chip: #fbefc4; --chip-ink: #1d2550; --head-bg: #fbe9a6; --head-ink: #1d2550;
+  body[data-palette="bluebonnet"] {    /* soft bluebonnet blue + indigo + butter yellow accent */
+    --bg: #f6f7fc; --ink: #1d2550; --muted: #5a5f7a; --line: #e1e4f0;
+    --brand: #1d2550; --brand-ink: #ffffff; --accent: #f2c230; --accent-ink: #1d2550;
+    --chip: #fbefc4; --chip-ink: #1d2550; --head-bg: #c9d4f6; --head-ink: #1d2550;
   }
   body[data-palette="bigbend"] {       /* soft warm gray + warm brown + cactus green */
     --bg: #f7f6f4; --ink: #3a2c26; --muted: #6b635e; --line: #e4e1dc;
@@ -1005,7 +1005,7 @@ form.addEventListener("click", async ev => {
 function toast(msg) { const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 2200); }
 
 /* ---------- Palette preview (prototype) ---------- */
-const PALETTES = { hillcountry: "Hill Country (sage)", gulf: "Gulf Coast (seafoam)", bluebonnet: "Bluebonnet (butter yellow)", bigbend: "Big Bend (soft gray)", bw: "Black & white" };
+const PALETTES = { hillcountry: "Hill Country (sage)", gulf: "Gulf Coast (seafoam)", bluebonnet: "Bluebonnet (blue + yellow)", bigbend: "Big Bend (soft gray)", bw: "Black & white" };
 $("#palettePick").innerHTML = Object.entries(PALETTES).map(([k, v]) => `<option value="${k}">${v}</option>`).join("");
 let palette = new URLSearchParams(location.search).get("palette");
 if (!PALETTES[palette]) { try { palette = localStorage.getItem("txenv-palette-v2"); } catch {} }
