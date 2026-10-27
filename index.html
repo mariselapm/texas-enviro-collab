@@ -71,8 +71,8 @@
   .title-line { display: flex; align-items: baseline; gap: 8px; font-size: 14px; font-weight: 500; color: var(--ink); }
   .title-line::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex: none; transform: translateY(-1px); }
   .clamp { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-  [data-card] { cursor: pointer; transition: box-shadow .15s, border-color .15s; }
-  .card[data-card]:hover { border-color: var(--muted); box-shadow: 0 6px 20px rgba(0,0,0,.08); }
+  .name-link { font: inherit; color: inherit; background: none; border: 0; padding: 0; text-align: left; cursor: pointer; }
+  .name-link:hover { text-decoration: underline; }
   .clamp.open { display: block; -webkit-line-clamp: unset; }
   .more { font: 400 13px var(--body-font); color: var(--muted); background: none; border: 0; padding: 0; margin-top: -4px; cursor: pointer; text-decoration: none; justify-self: start; align-self: flex-start; }
   .oneline { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -618,6 +618,8 @@ function titleLine(p) {
   return p.role ? `${p.role} from ${org}` : org;
 }
 const pIdx = p => state.people.indexOf(p);
+// A person's name opens Connect, same as the Connect button
+const nameLink = p => p.email ? `<button type="button" class="name-link" data-connect="${pIdx(p)}">${esc(p.name)}</button>` : esc(p.name);
 const linksHtml = p => [
   p.portfolio && `<a href="${esc(url(p.portfolio))}" target="_blank" rel="noopener">Portfolio ↗</a>`,
   p.social && `<a href="${esc(url(p.social))}" target="_blank" rel="noopener">Social ↗</a>`,
@@ -633,11 +635,11 @@ function filteredPeople() {
 
 function personCard(p) {
   return `
-    <article class="card"${p.email ? ` data-card="${pIdx(p)}"` : ""}>
+    <article class="card">
       <div class="person-top">
         <div class="avatar" aria-hidden="true">${esc(initials(p.name))}</div>
         <div class="pt-text">
-          <h3>${esc(p.name)}</h3>
+          <h3>${nameLink(p)}</h3>
           <div class="meta oneline">${esc(cityTX(p))}</div>
         </div>
       </div>
@@ -705,9 +707,9 @@ function personProfiles(list) {
 
 function personEditorial(list) {
   return `<div class="ed-list">${list.map(p => `
-    <article class="ed-item"${p.email ? ` data-card="${pIdx(p)}"` : ""}>
+    <article class="ed-item">
       <div class="kicker">${[p.role, p.region].filter(Boolean).map(esc).join(" · ")}</div>
-      <h3>${esc(p.name)}</h3>
+      <h3>${nameLink(p)}</h3>
       <div class="meta">${[p.org, p.city].filter(Boolean).map(esc).join(", ")}</div>
       ${p.bio ? `<p>${esc(p.bio)}</p>` : ""}
       ${p.topicsList.length ? `<p class="ed-line"><b>Covers</b> ${p.topicsList.map(esc).join(", ")}</p>` : ""}
@@ -744,9 +746,6 @@ $("#peopleGrid").addEventListener("click", ev => {
   if (t) { $("#pTopic").value = t.dataset.topic; renderPeople(); return; }
   const c = ev.target.closest("[data-connect]");
   if (c) { ev.preventDefault(); openConnect(state.people[+c.dataset.connect]); return; }
-  // Clicking anywhere else on a person's card opens Connect too (links and buttons keep their own job)
-  const card = ev.target.closest("[data-card]");
-  if (card && !ev.target.closest("a, button") && !getSelection().toString()) { openConnect(state.people[+card.dataset.card]); return; }
   const s = ev.target.closest("[data-sel]");
   if (s) {
     state.sel = +s.dataset.sel; renderPeople();
