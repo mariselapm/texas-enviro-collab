@@ -297,6 +297,7 @@
     <nav class="tabs" role="tablist">
       <button role="tab" data-tab="people" aria-selected="true">People</button>
       <button role="tab" data-tab="events" aria-selected="false">Events</button>
+      <button role="tab" data-tab="resources" aria-selected="false">Resources</button>
       <button role="tab" data-tab="about" aria-selected="false">About</button>
     </nav>
   </div>
@@ -348,6 +349,46 @@
     </div>
     <div class="count" id="eCount"></div>
     <div class="grid events-grid" id="eventsGrid"></div>
+  </section>
+
+  <!-- RESOURCES -->
+  <section id="tab-resources" hidden>
+    <div class="hero">
+      <h1>Resources for environmental reporting.</h1>
+      <p>Tools for finding experts, data, research and legislation when you're covering the environment in Texas.</p>
+    </div>
+    <div class="grid">
+      <article class="card">
+        <span class="role">Find an expert</span>
+        <h3>SciLine expert-matching service</h3>
+        <p class="bio">A free service from the American Association for the Advancement of Science (AAAS) that matches U.S. journalists with scientists for interviews. Submit a request on weekdays with at least two working hours' notice.</p>
+        <div class="card-foot"><a class="btn" href="https://www.sciline.org/i-need-an-expert-now/" target="_blank" rel="noopener">Visit site ↗</a></div>
+      </article>
+      <article class="card">
+        <span class="role">Journalism network</span>
+        <h3>Covering Climate Now</h3>
+        <p class="bio">A network of more than 500 news outlets worldwide working to strengthen climate coverage. Offers reporting guides and tipsheets, webinars and trainings, press briefings and a weekly newsletter.</p>
+        <div class="card-foot"><a class="btn" href="https://coveringclimatenow.org/" target="_blank" rel="noopener">Visit site ↗</a></div>
+      </article>
+      <article class="card">
+        <span class="role">Research</span>
+        <h3>Climate Change Impacts in Texas: Integrated Analysis and Adaptation</h3>
+        <p class="bio">A book edited by Mona Wells and Ryan McManamay (Taylor &amp; Francis) that brings together research on how climate change is affecting Texas and how the state can adapt.</p>
+        <div class="card-foot"><a class="btn" href="https://www.taylorfrancis.com/books/edit/10.1201/9781003406600/climate-change-impacts-texas-mona-wells-ryan-mcmanamay" target="_blank" rel="noopener">Visit site ↗</a></div>
+      </article>
+      <article class="card">
+        <span class="role">Data</span>
+        <h3>Texas Commission on Environmental Quality (TCEQ) Data Search</h3>
+        <p class="bio">The state environmental agency's lookup tools for air and water quality data, permits, complaints, investigations, enforcement actions and emission event reports. Useful for checking on a facility or neighborhood.</p>
+        <div class="card-foot"><a class="btn" href="https://www.tceq.texas.gov/agency/data/lookup-data" target="_blank" rel="noopener">Visit site ↗</a></div>
+      </article>
+      <article class="card">
+        <span class="role">Policy</span>
+        <h3>Texas Legislature Online</h3>
+        <p class="bio">The official site for the Texas Legislature. Search and track bills, read bill text and analyses, follow committee hearings and votes, and find who represents an area.</p>
+        <div class="card-foot"><a class="btn" href="https://capitol.texas.gov/" target="_blank" rel="noopener">Visit site ↗</a></div>
+      </article>
+    </div>
   </section>
 
   <!-- ABOUT -->
@@ -468,12 +509,12 @@ $("#joinLink").href = "mailto:" + CONFIG.teamEmail;
 /* ---------- Tabs ---------- */
 function showTab(name) {
   document.querySelectorAll("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === name));
-  ["people", "events", "about"].forEach(t => $("#tab-" + t).hidden = t !== name);
+  ["people", "events", "resources", "about"].forEach(t => $("#tab-" + t).hidden = t !== name);
   markClamps(document);
   history.replaceState(null, "", "#" + name);
 }
 document.querySelectorAll("nav.tabs button").forEach(b => b.onclick = () => showTab(b.dataset.tab));
-if (["#events", "#about"].includes(location.hash)) showTab(location.hash.slice(1));
+if (["#events", "#resources", "#about"].includes(location.hash)) showTab(location.hash.slice(1));
 
 /* ---------- Reading the spreadsheet ---------- */
 // Header matching is forgiving: case, spaces and anything in (parentheses) are ignored,
